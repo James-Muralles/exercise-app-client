@@ -25,8 +25,8 @@ export const tokens = {
       500: "#e7e7e7",
     },
     background: {
-      light: "#2d2d34",
-      main: "#1f2026",
+      light: "#6eb2cc",
+      main: "#2f6a87",
     },
   };
   
@@ -69,19 +69,19 @@ export const tokens = {
         fontFamily: ["Inter", "sans-serif"].join(","),
         fontSize: 20,
         fontWeight: 800,
-        color: tokens.grey[200],
+        color: tokens.tertiary[500],
       },
       h4: {
         fontFamily: ["Inter", "sans-serif"].join(","),
         fontSize: 14,
         fontWeight: 600,
-        color: tokens.grey[300],
+        color: tokens.tertiary[500],
       },
       h5: {
         fontFamily: ["Inter", "sans-serif"].join(","),
         fontSize: 12,
         fontWeight: 400,
-        color: tokens.grey[500],
+        color: tokens.tertiary[500],
       },
       h6: {
         fontFamily: ["Inter", "sans-serif"].join(","),
