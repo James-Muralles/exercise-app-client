@@ -1,54 +1,119 @@
-import {useState} from 'react';
-import { Link } from 'react-router-dom';
-import { Box,Typography, useTheme } from '@mui/material';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FlexBetween from '@/components/FlexBetween';
 import PixIcon from '@mui/icons-material/Pix';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useDispatch, useSelector } from 'react-redux';
 
 const NavBar = () => {
-    const {palette} = useTheme();
-    const [selectedPage, setSelectedPage] = useState("loginPage");
+  const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const navigate = useNavigate();
+  const isMobileScreens = useMediaQuery('(max-width: 1000px)');
+  const { palette } = useTheme();
+  const [selectedPage, setSelectedPage] = useState('loginPage');
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuToggled(!isMobileMenuToggled);
+  };
+
+  const handleLoginClick = () => {
+    if (isMobileScreens) {
+      setIsMobileMenuToggled(false); // Close the mobile menu when "Login" is clicked
+    }
+    setSelectedPage('loginPage');
+    navigate('/login'); // Navigate to the login page
+  };
+
   return (
-    <FlexBetween mb="0.25rem" p=".5rem 0rem" color={palette.tertiary[500]}>
+    <FlexBetween flexDirection={isMobileScreens ? 'column' : 'row'} mb="0.25rem" p=".5rem 0rem" color={palette.tertiary[500]}>
+      {/* LEFT SIDE */}
+      <FlexBetween gap=".75rem">
+        <PixIcon sx={{ fontSize: '23px' }} />
+        <Typography variant="h4" fontSize="16px">
+          Jim Buddy
+        </Typography>
+      </FlexBetween>
 
-        {/* LEFT SIDE */}
-        <FlexBetween gap=".75rem">
-            <PixIcon sx={{fontSize: "23px"}}/>
-            <Typography variant="h4" fontSize="16px">
-                Jim Buddy
-            </Typography>
-        </FlexBetween>
-
-        {/* RIGHT SIDE */}
-        <FlexBetween gap="2rem"  >
-            {/* @ts-ignore */}
-            <Box sx={{"&:hover": { color: palette.secondary[200]}}}>
-                <Link 
-                to="/"
-                onClick={()=> setSelectedPage("loginPage")}
-                style={{
-                    color: selectedPage === "loginPage" ? "inherit": palette.grey[500],
-                    textDecoration: "inherit"
-                }}
+      {/* RIGHT SIDE (Responsive) */}
+      {isMobileScreens ? (
+        // Display on mobile screens
+        <Box>
+          <button
+            onClick={toggleMobileMenu}
+            style={{
+              width: '50vw', // Set the width to 80% of the viewport width
+              height: '10vh',
+              display: 'block',
+              borderColor: palette.secondary[200],
+              borderRadius: '5px',
+            }}
+          >
+            <MenuIcon fontSize="large" />
+          </button>
+          {isMobileMenuToggled && (
+            <div>
+              <div>
+                <Link
+                  style={{
+                    color: selectedPage === 'loginPage' ? 'inherit' : palette.grey[500],
+                    textDecoration: 'inherit',
+                  }}
+                  onClick={handleLoginClick}
                 >
-                login</Link>
-            </Box>
-            {/* @ts-ignore */}
-            <Box >
-                <Link 
-                to="/register"
-                onClick={()=> setSelectedPage("registerPage")}
-                style={{
-                    color: selectedPage === "registerPage" ? "inherit": palette.grey[500],
-                    textDecoration: "inherit",
-                    
-                }}
+                  <Typography textAlign="center" fontSize="5vh">
+                    LOGIN
+                  </Typography>
+                </Link>
+              </div>
+              <div>
+                <Link
+                  style={{
+                    color: selectedPage === 'registerPage' ? 'inherit' : palette.grey[500],
+                    textDecoration: 'inherit',
+                  }}
+                  to="/register"
+                  onClick={() => setSelectedPage('registerPage')}
                 >
-                register</Link>
-            </Box>
+                  <Typography textAlign="center" fontSize="5vh">
+                    REGISTER
+                  </Typography>
+                </Link>
+              </div>
+            </div>
+          )}
+        </Box>
+      ) : (
+        // Display on non-mobile screens
+        <FlexBetween gap="2rem">
+          <Box sx={{ '&:hover': { color: palette.secondary[200] } }}>
+            <Link
+              to="/"
+              onClick={handleLoginClick}
+              style={{
+                color: selectedPage === 'loginPage' ? 'inherit' : palette.grey[500],
+                textDecoration: 'inherit',
+              }}
+            >
+              login
+            </Link>
+          </Box>
+          <Box>
+            <Link
+              to="/register"
+              onClick={() => setSelectedPage('registerPage')}
+              style={{
+                color: selectedPage === 'registerPage' ? 'inherit' : palette.grey[500],
+                textDecoration: 'inherit',
+              }}
+            >
+              register
+            </Link>
+          </Box>
         </FlexBetween>
-
+      )}
     </FlexBetween>
-  )
-}
+  );
+};
 
 export default NavBar;
