@@ -4,6 +4,7 @@ import { themeSettings } from "./theme"
 import { Box, CssBaseline } from "@mui/material"
 import NavBar from "./scenes/navbar"
 import LoginPage from "@/scenes/loginPage";
+import RegisterPage from "@/scenes/registerPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
@@ -22,6 +23,9 @@ function App() {
         <NavBar/>
         <Routes>
           <Route path="/" element={<LoginPage/>}/>
+        </Routes>
+        <Routes>
+          <Route path="/register" element={<RegisterPage/>}/>
         </Routes>
         </Box>
         </ThemeProvider>

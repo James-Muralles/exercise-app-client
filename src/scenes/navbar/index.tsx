@@ -25,6 +25,16 @@ const NavBar = () => {
     navigate('/login'); // Navigate to the login page
   };
 
+  const handleRegisterClick = () => {
+    if (isMobileScreens) {
+      setIsMobileMenuToggled(false); // Close the mobile menu when "Login" is clicked
+    }
+    setSelectedPage('registerPage');
+    navigate('/register'); // Navigate to the login page
+  };
+
+  
+
   return (
     <FlexBetween flexDirection={isMobileScreens ? 'column' : 'row'} mb="0.25rem" p=".5rem 0rem" color={palette.tertiary[500]}>
       {/* LEFT SIDE */}
@@ -60,6 +70,7 @@ const NavBar = () => {
                     textDecoration: 'inherit',
                   }}
                   onClick={handleLoginClick}
+                  to="/"
                 >
                   <Typography textAlign="center" fontSize="5vh">
                     LOGIN
@@ -72,8 +83,8 @@ const NavBar = () => {
                     color: selectedPage === 'registerPage' ? 'inherit' : palette.grey[500],
                     textDecoration: 'inherit',
                   }}
+                  onClick={handleRegisterClick}
                   to="/register"
-                  onClick={() => setSelectedPage('registerPage')}
                 >
                   <Typography textAlign="center" fontSize="5vh">
                     REGISTER

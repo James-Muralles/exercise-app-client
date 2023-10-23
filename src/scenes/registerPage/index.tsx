@@ -1,30 +1,44 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, useMediaQuery, useTheme } from '@mui/material';
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // State variables for username and password
+  // State variables for name, username, password, and email
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   // Handle form submission
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // You can perform the login action here, e.g., send a request to your server
     // with the username and password.
-    console.log('Username:', username);
-    console.log('Password:', password);
+   
   };
 
   return (
-    <Box>
-      <Typography variant="h4">Login</Typography>
-      <form onSubmit={handleLogin}>
+    <Box >
+      <Typography variant="h4">Register</Typography>
+      <form onSubmit={handleRegister}>
         {isMobileScreen ? (
           // Mobile view
           <>
+            <TextField
+             style={{
+               width: '100%',
+               background: 'white',
+               
+              }}
+              label="name"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={name}
+              onChange={(e) => setUsername(e.target.value)}
+              />
             <TextField
               style={{
                 width: '100%',
@@ -37,6 +51,20 @@ const LoginPage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
+
+            <TextField
+              style={{
+                width: '100%',
+                background: 'white',
+              }}
+              label="email"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={email}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+
             <TextField
               style={{
                 width: '100%',
@@ -64,10 +92,32 @@ const LoginPage = () => {
                 width: '40vh',
                 background: 'white',
               }}
+              label="name"
+              variant="outlined"
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              style={{
+                width: '40vh',
+                background: 'white',
+              }}
               label="Username"
               variant="outlined"
               margin="normal"
               value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              style={{
+                width: '40vh',
+                background: 'white',
+              }}
+              label="email"
+              variant="outlined"
+              margin="normal"
+              value={email}
               onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
@@ -93,4 +143,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
