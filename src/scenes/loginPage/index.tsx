@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, TextField, Button, useMediaQuery, useTheme} from '@mui/material';
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -11,6 +11,7 @@ const LoginPage = () => {
 
   // Handle form submission
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    
     e.preventDefault();
     // You can perform the login action here, e.g., send a request to your server
     // with the username and password.
@@ -19,12 +20,12 @@ const LoginPage = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4">Login</Typography>
+    <Box sx={{width: '100%'}}>
       <form onSubmit={handleLogin}>
         {isMobileScreen ? (
           // Mobile view
           <>
+          {/* <Typography  variant="h4">Login</Typography> */}
             <TextField
               style={{
                 width: '100%',
@@ -50,15 +51,28 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <Button  
+             variant="contained"
+              style={{
+                backgroundColor: theme.palette.secondary[200],
+                color: theme.palette.tertiary[500],
+                border: `1px solid ${theme.palette.tertiary[500]}`
+                      }}
+              type="submit">
+          Log In
+        </Button>
           </>
         ) : (
           // Desktop view
+          
           <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
           >
+      {/* <Typography  variant="h4">Login</Typography> */}
+
             <TextField
               style={{
                 width: '40vh',
@@ -82,7 +96,14 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-             <Button variant="contained" color="primary" type="submit">
+             <Button  
+             variant="contained"
+              style={{
+                backgroundColor: theme.palette.secondary[200],
+                color: theme.palette.tertiary[500],
+                border: `1px solid ${theme.palette.tertiary[500]}`
+                      }}
+              type="submit">
           Log In
         </Button>
           </Box>

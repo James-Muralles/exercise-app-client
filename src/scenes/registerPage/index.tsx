@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, useMediaQuery, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+  const [selectedPage, setSelectedPage] = useState('loginPage');  
+  const [isRegistered, setIsRegistered] = useState('not complete');
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  
 
   // State variables for name, username, password, and email
   const [name, setName] = useState('');
@@ -11,17 +19,29 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
+  
+
   // Handle form submission
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // You can perform the login action here, e.g., send a request to your server
-    // with the username and password.
-   
+    try{
+    setIsRegistered("Completed");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsRegistered("Completed");
+    console.log("registered successfully")
+    setSelectedPage('loginPage');
+    navigate('/');
+    }catch(e){
+      console.error('Registration Failed', e);
+      setIsRegistered('not complete');
+    }
+
+    
   };
 
   return (
     <Box >
-      <Typography variant="h4">Register</Typography>
+      {/* <Typography variant="h4">Register</Typography> */}
       <form onSubmit={handleRegister}>
         {isMobileScreen ? (
           // Mobile view
@@ -78,6 +98,15 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <Button variant="contained"
+              style={{
+                backgroundColor: theme.palette.secondary[200],
+                color: theme.palette.tertiary[500],
+                border: `1px solid ${theme.palette.tertiary[500]}`
+                      }}
+              type="submit">
+          Register
+        </Button>
           </>
         ) : (
           // Desktop view
@@ -132,8 +161,14 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-             <Button variant="contained" color="primary" type="submit">
-          Log In
+             <Button variant="contained"
+              style={{
+                backgroundColor: theme.palette.secondary[200],
+                color: theme.palette.tertiary[500],
+                border: `1px solid ${theme.palette.tertiary[500]}`
+                      }}
+              type="submit">
+          Register
         </Button>
           </Box>
         )}
