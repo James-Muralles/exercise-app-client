@@ -32,7 +32,7 @@ const NavBar = () => {
   };
 
   // Increase the size of the img when in mobile mode
-  const imgSize = isMobileScreens ? '40px' : '23px';
+  const imgSize = isMobileScreens ? '2.5rem' : '1.5rem';
 
   
 
@@ -50,7 +50,7 @@ const NavBar = () => {
             alt="jim-icon" src='src/assets/man-lifting-weights.png'
             />
         
-        <Typography sx={{color: `${palette.secondary[100]}`}} variant="h4" fontSize="16px">
+        <Typography sx={{color: `${palette.secondary[100]}`}} variant="h4" fontSize="1rem">
           Jim Buddy
         </Typography>
         </>
