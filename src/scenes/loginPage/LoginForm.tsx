@@ -8,8 +8,8 @@ import { setLogin } from '@/state';
 import { LoginFormValues } from '@/state/types';
 
 const loginSchema = yup.object().shape({
-  username: yup.string().required('Username is required'),
-  password: yup.string().required('Password is required'),
+  username: yup.string().required('required'),
+  password: yup.string().required('required'),
 });
 
 const initialLoginValues = {
@@ -47,14 +47,13 @@ const LoginForm = () => {
             token: loggedIn.token,
           })
         );
-        navigate('/home');
       } else {
         console.log("Login failed.");
       }
     };
     
 
-  const handleFormSubmit = async (values, onSubmitProps) => {
+  const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
     await login(values, onSubmitProps);
     navigate('/home');
 

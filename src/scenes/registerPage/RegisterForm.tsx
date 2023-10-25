@@ -1,48 +1,77 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Formik } from 'formik';
+import { useDispatch } from 'react-redux';
+import * as yup from 'yup';
+import { RegisterFormValues } from '@/state/types';
 
 
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const [selectedPage, setSelectedPage] = useState('loginPage');  
-  const [isRegistered, setIsRegistered] = useState('not complete');
+  // const [selectedPage, setSelectedPage] = useState('loginPage');  
+  // const [isRegistered, setIsRegistered] = useState('not complete');
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const registerSchema = yup.object().shape({
+    firstName: yup.string().required('required'),
+    lastName: yup.string().required('required'),
+    email: yup.string().required('required'),
+    username: yup.string().required('required'),
+    password: yup.string().required('required'),
+  });
+
+  const initialLoginValues = {
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    password: '',
+  };
+
   
 
-  // State variables for name, username, password, and email
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const register = async (values: RegisterFormValues, onSubmitProps: { resetForm: () => void; }) =>{
+    const formData = new FormData();
+    const savedUserResponse = await fetch(
+      "http://localhost:1337/auth/register",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    const savedUser = await savedUserResponse.json();
+    console.log(savedUser)
+    onSubmitProps.resetForm();
 
-  
+  }
 
   // Handle form submission
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try{
-    setIsRegistered("Completed");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsRegistered("Completed");
-    console.log("registered successfully")
-    setSelectedPage('loginPage');
-    navigate('/');
-    }catch(e){
-      console.error('Registration Failed', e);
-      setIsRegistered('not complete');
-    }
-
-    
+  const handleFormSubmit = async (values: RegisterFormValues, onSubmitProps: { resetForm: () => void; }) => {
+    await register(values, onSubmitProps);
+    navigate("/home");
   };
+
 
   return (
     <Box >
-      {/* <Typography variant="h4">Register</Typography> */}
-      <form onSubmit={handleRegister}>
+        <Formik
+      onSubmit={handleFormSubmit} 
+      initialValues={initialLoginValues}
+      validationSchema={registerSchema}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+        resetForm,
+      }) => (
+      <form onSubmit={handleSubmit}>
         {isMobileScreen ? (
           // Mobile view
           <>
@@ -52,12 +81,33 @@ const RegisterForm = () => {
                background: 'white',
                
               }}
-              label="name"
+              label="First Name"
+              name='firstName'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.firstName}
+              error={Boolean(touched.firstName) && Boolean(errors.firstName)}
+              helperText={touched.firstName && errors.firstName}
               fullWidth
               margin="normal"
-              value={name}
-              onChange={(e) => setUsername(e.target.value)}
+              />
+              <TextField
+             style={{
+               width: '100%',
+               background: 'white',
+               
+              }}
+              label="Last Name"
+              name='lastName'
+              variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.lastName}
+              error={Boolean(touched.lastName) && Boolean(errors.lastName)}
+              helperText={touched.lastName && errors.lastName}
+              fullWidth
+              margin="normal"
               />
             <TextField
               style={{
@@ -65,11 +115,15 @@ const RegisterForm = () => {
                 background: 'white',
               }}
               label="Username"
+              name='username'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.username}
+              error={Boolean(touched.username) && Boolean(errors.username)}
+              helperText={touched.username && errors.username}
               fullWidth
               margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
 
             <TextField
@@ -77,12 +131,16 @@ const RegisterForm = () => {
                 width: '100%',
                 background: 'white',
               }}
-              label="email"
+              label="Email"
+              name='email'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.email}
+              error={Boolean(touched.email) && Boolean(errors.email)}
+              helperText={touched.email && errors.email}
               fullWidth
               margin="normal"
-              value={email}
-              onChange={(e) => setUsername(e.target.value)}
             />
 
             <TextField
@@ -91,12 +149,16 @@ const RegisterForm = () => {
                 background: 'white',
               }}
               label="Password"
-              type="password"
+              name='password'
+              type='password'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.password}
+              error={Boolean(touched.password) && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
               fullWidth
               margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
             <Button variant="contained"
               style={{
@@ -121,11 +183,32 @@ const RegisterForm = () => {
                 width: '40vh',
                 background: 'white',
               }}
-              label="name"
+              label="First Name"
+              name='firstName'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.firstName}
+              error={Boolean(touched.firstName) && Boolean(errors.firstName)}
+              helperText={touched.firstName && errors.firstName}
+              fullWidth
               margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              style={{
+                width: '40vh',
+                background: 'white',
+              }}
+              label="Last Name"
+              name='lastName'
+              variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.lastName}
+              error={Boolean(touched.lastName) && Boolean(errors.lastName)}
+              helperText={touched.lastName && errors.lastName}
+              fullWidth
+              margin="normal"
             />
             <TextField
               style={{
@@ -133,21 +216,31 @@ const RegisterForm = () => {
                 background: 'white',
               }}
               label="Username"
+              name='username'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.username}
+              error={Boolean(touched.username) && Boolean(errors.username)}
+              helperText={touched.username && errors.username}
+              fullWidth
               margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               style={{
                 width: '40vh',
                 background: 'white',
               }}
-              label="email"
+              label="Email"
+              name='email'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.email}
+              error={Boolean(touched.email) && Boolean(errors.email)}
+              helperText={touched.email && errors.email}
+              fullWidth
               margin="normal"
-              value={email}
-              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               style={{
@@ -155,11 +248,16 @@ const RegisterForm = () => {
                 background: 'white',
               }}
               label="Password"
-              type="password"
+              name='password'
+              type='password'
               variant="outlined"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.password}
+              error={Boolean(touched.password) && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
+              fullWidth
               margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
              <Button variant="contained"
               style={{
@@ -169,11 +267,12 @@ const RegisterForm = () => {
                       }}
               type="submit">
           Register
-        </Button>
-          </Box>
-        )}
-       
-      </form>
+         </Button>
+            </Box>
+          )}
+        </form>
+      )}
+    </Formik>
     </Box>
   );
 };
