@@ -9,5 +9,11 @@ export interface RegisterFormValues {
     username: string;
     password: string;
   }
+  
+export interface AuthState {
+    user: any; // Replace 'any' with the actual type of your user object
+    token: string | null;
+  };
+
 
   
