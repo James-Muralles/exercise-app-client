@@ -34,12 +34,13 @@ const RegisterForm = () => {
   
 
   const register = async (values: RegisterFormValues, onSubmitProps: { resetForm: () => void; }) =>{
-    const formData = new FormData();
+    // const formData = new FormData();
     const savedUserResponse = await fetch(
       "http://localhost:1337/auth/register",
       {
         method: "POST",
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
       }
     );
     const savedUser = await savedUserResponse.json();
