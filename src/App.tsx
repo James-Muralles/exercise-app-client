@@ -6,13 +6,16 @@ import NavBar from "./scenes/navbar"
 import LoginPage from "@/scenes/loginPage";
 import RegisterPage from "@/scenes/registerPage";
 import HomePage from "@/scenes/homePage";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 
 
 
 function App() {
   const theme= useMemo(() => createTheme(themeSettings), [])
+  const isAuth = Boolean(useSelector((state: any) => state.token));
+
   return (
    
       <div className="app">
@@ -23,9 +26,9 @@ function App() {
         <Box width="100%" height="100%" padding="1rem 2rem 4rem 2rem">
         <NavBar/>
         <Routes>
-          <Route path="/" element={<LoginPage/>}/>
+          <Route path="/login" element={<LoginPage/>}/>
           <Route path="/register" element={<RegisterPage/>}/>
-          <Route path="/home" element={<HomePage/>}/>
+          <Route path="/home" element={isAuth ? <HomePage/> : <Navigate to="/login"/>}/>
         </Routes>
         
         </Box>

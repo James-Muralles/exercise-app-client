@@ -5,19 +5,12 @@ import { Formik } from 'formik';
 import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
 import { setLogin } from '@/state';
+import { LoginFormValues } from '@/state/types';
 
 const loginSchema = yup.object().shape({
-  username: yup
-    .string()
-    .required('Username is required')
-    .test('custom-validation', 'Invalid username', (value) => {
-      // Add your custom validation logic here
-      // Return true if the value is valid, or return a string with an error message if it's invalid
-      return /* your validation logic */;
-    }),
+  username: yup.string().required('Username is required'),
   password: yup.string().required('Password is required'),
 });
-
 
 const initialLoginValues = {
   username: '',
@@ -27,43 +20,50 @@ const initialLoginValues = {
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  //  const [pageType, setPageType] = useState("login");
+  // const isLogin = pageType === "login";
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // State variables for username and password
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+    const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
+      console.log("Attempting to log in...");
+    
+      const loggedInResponse = await fetch('http://localhost:1337/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+      const loggedIn = await loggedInResponse.json();
+    
+      console.log("Logged in:", loggedIn);
+    
+      onSubmitProps.resetForm();
+      
+      if (loggedIn) {
+        console.log("Redirecting to /home...");
+        dispatch(
+          setLogin({
+            user: loggedIn.user,
+            token: loggedIn.token,
+          })
+        );
+        navigate('/home');
+      } else {
+        console.log("Login failed.");
+      }
+    };
+    
 
-  const login = async (values, onSubmitProps) => {
-    const loggedInResponse = await fetch('http://localhost/1337/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
-    });
-    const loggedIn = await loggedInResponse.json();
-    onSubmitProps.resetForm();
-    if (loggedIn) {
-      dispatch(
-        setLogin({
-          user: loggedIn.user,
-          token: loggedIn.token,
-        })
-      );
-      navigate('/home');
-    }
-  };
-
-  // Handle form submission
-  const handleLogin = async (values, onSubmitProps) => {
+  const handleFormSubmit = async (values, onSubmitProps) => {
     await login(values, onSubmitProps);
-    // with the username and password.
-    console.log('Username:', username);
-    console.log('Password:', password);
+    navigate('/home');
+
   };
+    
 
   return (
     <Formik
-      onSubmit={handleLogin}
+      onSubmit={handleFormSubmit} 
       initialValues={initialLoginValues}
       validationSchema={loginSchema}
     >
@@ -74,12 +74,10 @@ const LoginForm = () => {
         handleBlur,
         handleChange,
         handleSubmit,
-        // setFieldValue,
         resetForm,
       }) => (
         <form onSubmit={handleSubmit}>
           {isMobileScreen ? (
-            // Mobile view
             <>
               <TextField
                 style={{
@@ -87,6 +85,7 @@ const LoginForm = () => {
                   background: 'white',
                 }}
                 label="Username"
+                name='username'
                 variant="outlined"
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -102,6 +101,7 @@ const LoginForm = () => {
                   background: 'white',
                 }}
                 label="Password"
+                name='password'
                 variant="outlined"
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -113,7 +113,6 @@ const LoginForm = () => {
               />
               <Button
                 onClick={() => {
-                  resetForm();
                 }}
                 variant="contained"
                 style={{
@@ -127,7 +126,6 @@ const LoginForm = () => {
               </Button>
             </>
           ) : (
-            // Desktop view
             <Box
               display="flex"
               flexDirection="column"
@@ -140,10 +138,14 @@ const LoginForm = () => {
                   background: 'white',
                 }}
                 label="Username"
+                name="username"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                error={Boolean(touched.username) && Boolean(errors.username)}
+                helperText={touched.username && errors.username}
                 variant="outlined"
                 margin="normal"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={values.username}
               />
               <TextField
                 style={{
@@ -151,11 +153,14 @@ const LoginForm = () => {
                   background: 'white',
                 }}
                 label="Password"
+                name="password"
                 type="password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                error={Boolean(touched.password) && Boolean(errors.password)}
+                helperText={touched.password && errors.password}
                 variant="outlined"
-                margin="normal"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={values.password}
               />
               <Button
                 variant="contained"

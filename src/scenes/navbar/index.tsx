@@ -94,7 +94,7 @@ const NavBar = () => {
                     textDecoration: 'inherit',
                   }}
                   onClick={handleLoginClick}
-                  to="/"
+                  to="/login"
                 >
                   <Typography textAlign="center" fontSize="5vh">
                     LOGIN
@@ -123,7 +123,7 @@ const NavBar = () => {
         <FlexBetween  gap="2rem">
           <Box sx={{ '&:hover': { color: palette.secondary[200] } }}>
             <Link
-              to="/"
+              to="/login"
               onClick={handleLoginClick}
               style={{
                 color: selectedPage === 'loginPage' ? 'inherit' : palette.grey[500],
