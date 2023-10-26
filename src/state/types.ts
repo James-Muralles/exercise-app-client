@@ -16,6 +16,16 @@ export interface AuthState {
     isAuthenticated: boolean;
   };
 
+  export interface GetExercisesResponse {
+    name: string;
+    type: string;
+    muscle: string;
+    equipment: string;
+    difficulty: string;
+    instructions: string;
+  }
+  
+
 
 
   

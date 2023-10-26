@@ -20,15 +20,11 @@ const initialLoginValues = {
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  //  const [pageType, setPageType] = useState("login");
-  // const isLogin = pageType === "login";
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
   
-
-    const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
+const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
   console.log("Attempting to log in...");
-
   try {
     const loggedInResponse = await fetch('http://localhost:1337/auth/login', {
       method: 'POST',
@@ -61,8 +57,7 @@ const LoginForm = () => {
   }
 };
     
-
-  const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
+const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
     await login(values, onSubmitProps);
     navigate('/home');
 
