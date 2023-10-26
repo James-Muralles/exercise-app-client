@@ -9,7 +9,7 @@ const RegisterPage = () => {
 
   return (
     <Box>
-      <RegisterForm/>      
+      <RegisterForm/>
     </Box>
   );
 };

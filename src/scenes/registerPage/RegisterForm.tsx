@@ -10,8 +10,6 @@ import { RegisterFormValues } from '@/state/types';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  // const [selectedPage, setSelectedPage] = useState('loginPage');  
-  // const [isRegistered, setIsRegistered] = useState('not complete');
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
