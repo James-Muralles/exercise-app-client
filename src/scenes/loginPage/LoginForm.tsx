@@ -24,33 +24,42 @@ const LoginForm = () => {
   // const isLogin = pageType === "login";
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  
 
     const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
-      console.log("Attempting to log in...");
+  console.log("Attempting to log in...");
+
+  try {
+    const loggedInResponse = await fetch('http://localhost:1337/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+
+    if (!loggedInResponse.ok) {
+      // Handle the case where login failed (e.g., wrong credentials)
+      console.log("Login failed.");
+      return;
+    }
+
+    const loggedIn = await loggedInResponse.json();
+    console.log("Logged in:", loggedIn);
+
+    onSubmitProps.resetForm();
     
-      const loggedInResponse = await fetch('http://localhost:1337/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      const loggedIn = await loggedInResponse.json();
+    // Only update the state if the login was successful
+    dispatch(
+      setLogin({
+        user: loggedIn.user,
+        token: loggedIn.token,
+      })
+    );
     
-      console.log("Logged in:", loggedIn);
-    
-      onSubmitProps.resetForm();
-      
-      if (loggedIn) {
-        console.log("Redirecting to /home...");
-        dispatch(
-          setLogin({
-            user: loggedIn.user,
-            token: loggedIn.token,
-          })
-        );
-      } else {
-        console.log("Login failed.");
-      }
-    };
+  } catch (error) {
+    // Handle network errors or other issues
+    console.error("Login error:", error);
+  }
+};
     
 
   const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {

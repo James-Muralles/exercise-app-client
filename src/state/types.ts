@@ -13,7 +13,9 @@ export interface RegisterFormValues {
 export interface AuthState {
     user: any; // Replace 'any' with the actual type of your user object
     token: string | null;
+    isAuthenticated: boolean;
   };
+
 
 
   
