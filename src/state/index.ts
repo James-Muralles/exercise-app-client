@@ -4,7 +4,7 @@ import { AuthState } from "./types";
 const initialState: AuthState = {
     user: null,
     token: null,
-    isAuthenticated: false, 
+    isAuthenticated: false, // Add isAuthenticated property
 }
 
 export const authSlice = createSlice({

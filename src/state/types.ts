@@ -23,6 +23,7 @@ export interface AuthState {
     equipment: string;
     difficulty: string;
     instructions: string;
+    id: number;
   }
   
 

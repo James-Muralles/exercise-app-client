@@ -1,53 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React,{useEffect, useMemo} from 'react'
 import { fetchExercises } from '@/state/exerciseApi';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectExercises } from '@/state/exerciseSlice';
+import { useGetExercisesQuery } from '@/state/api';
+
+
+
 
 const HomePage = () => {
-  const dispatch = useDispatch();
-  const exerciseData = useSelector(selectExercises);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState([]);
+  const { data } = useGetExercisesQuery;
+  console.log(data)
+  const exercise = useMemo(() => {
+    return (
+      data &&
+      data[0].exerciseData.map(({ name, type }) => {
+        return {
+          name: name,
+          revenue: type,
+        };
+      })
+    );
+  }, [data]);
+  console.log(exercise)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const action = await dispatch(fetchExercises('chest'));
-        console.log(action)
-
-        if (fetchExercises.fulfilled.match(action)) {
-          // Exercise data is successfully fetched
-          setData(action.payload);
-        } else if (fetchExercises.rejected.match(action)) {
-          // Error occurred while fetching data
-          setError(action.error.message);
-        }
-      } catch (error) {
-        setError('An error occurred.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [dispatch]);
+  
 
   return (
     <div>
-      <h1>Hello, welcome HOME!!!</h1>
-      {loading && <div>Loading...</div>}
-      {error && <div>Error: {error}</div>}
-      {data && (
-        <ul>
-          {data.map((exercise) => (
-            <li key={exercise.id}>{exercise.name}</li>
-          ))}
-        </ul>
-      )}
-      <button onClick={() => fetchData()}>Fetch Exercises</button>
+
+        Hello, welcome HOME!!!
+        {/* Your component UI */}
+      <button >Fetch Exercises</button>
     </div>
-  );
-};
+      
+  )
+}
 
 export default HomePage;
