@@ -4,7 +4,7 @@ import {
 } from "./types";
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:1337" }),
   reducerPath: "main",
   tagTypes: ["Exercises"],
   endpoints: (build) => ({
@@ -15,5 +15,4 @@ export const api = createApi({
   }),
 });
 
-export const {useGetExercisesQuery} =
-  api;
+export const {useGetExercisesQuery} = api;

@@ -8,13 +8,15 @@ import RegisterPage from "@/scenes/registerPage";
 import HomePage from "@/scenes/homePage";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthState } from "./state/types"
 
 
 
 
 function App() {
   const theme= useMemo(() => createTheme(themeSettings), [])
-  const isAuth = Boolean(useSelector((state: any) => state.token));
+  const isAuth = Boolean(useSelector((state: AuthState) => state.isAuthenticated));
+  console.log(isAuth)
 
   return (
    
@@ -28,7 +30,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage/>}/>
           <Route path="/register" element={<RegisterPage/>}/>
-          <Route path="/home" element={isAuth ? <HomePage/> : <Navigate to="/login"/>}/>
+          <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/login" />} />
         </Routes>
         
         </Box>

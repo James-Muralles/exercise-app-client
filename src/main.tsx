@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import authReducer from "./state"; 
+import authReducer from "./state";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import {
@@ -16,21 +16,25 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
-import thunk from 'redux-thunk'; // Import Thunk middleware
-
-
+import { api } from "@/state/api";
+import { combineReducers } from 'redux';
 
 const persistConfig = { key: "root", storage, version: 1 };
-const persistedReducer = persistReducer(persistConfig, authReducer); // Use your actual authReducer
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const rootReducer = combineReducers({
+  auth: persistedAuthReducer, // Your auth reducer
+  [api.reducerPath]: api.reducer, // The API reducer
+});
 const store = configureStore({
-  reducer: persistedReducer,
+  reducer: persistedAuthReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(thunk),
+    }).concat(api.middleware),
 });
+
 
 const rootElement = document.getElementById("root");
 

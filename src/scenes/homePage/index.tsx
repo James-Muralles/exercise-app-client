@@ -6,23 +6,29 @@ import { selectExercises } from '@/state/exerciseSlice';
 import { useGetExercisesQuery } from '@/state/api';
 
 
+  const getExercises = async () => {
+    console.log("Attempting to retrieve data");
+    try {
+      const exerciseResponse = await fetch('http://localhost:1337/exercise/exercises', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (!exerciseResponse.ok) {
+        // Handle the case where the request failed (e.g., network issues or server error).
+        console.log("Failed to retrieve data");
+        return;
+      }
 
+      // Assuming a successful response, you can process the data here.
+      const exerciseData = await exerciseResponse.json();
+      console.log("Successfully retrieved data:", exerciseData);
+    } catch (error) {
+      console.error("An error occurred while retrieving data:", error);
+    }
+};
+getExercises()
 
-const HomePage = () => {
-  const { data } = useGetExercisesQuery;
-  console.log(data)
-  const exercise = useMemo(() => {
-    return (
-      data &&
-      data[0].exerciseData.map(({ name, type }) => {
-        return {
-          name: name,
-          revenue: type,
-        };
-      })
-    );
-  }, [data]);
-  console.log(exercise)
 
   
 

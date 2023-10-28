@@ -57,11 +57,17 @@ const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => 
   }
 };
     
-const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
-    await login(values, onSubmitProps);
-    navigate('/home');
+// const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
+//     await login(values, onSubmitProps);
+//     navigate('/home');
 
-  };
+//   };
+  const handleFormSubmit = async (values: LoginFormValues, onSubmitProps: { resetForm: () => void; }) => {
+    await login(values, onSubmitProps);
+    console.log("Before navigation");
+    navigate('/home');
+    console.log("After navigation");
+};
     
 
   return (

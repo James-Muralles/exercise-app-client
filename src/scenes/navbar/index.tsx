@@ -35,7 +35,7 @@ const NavBar = () => {
   };
 
    // Use Redux to check if the user is authenticated
-   const isAuthenticated = useSelector((state: AuthState) => state.user !== null);
+   const isAuthenticated = useSelector((state: AuthState ) => state.isAuthenticated);
    const dispatch = useDispatch();
 
    const handleLogout = () => {
