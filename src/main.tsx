@@ -21,10 +21,7 @@ import { combineReducers } from 'redux';
 
 const persistConfig = { key: "root", storage, version: 1 };
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
-const rootReducer = combineReducers({
-  auth: persistedAuthReducer, // Your auth reducer
-  [api.reducerPath]: api.reducer, // The API reducer
-});
+
 const store = configureStore({
   reducer: persistedAuthReducer,
   middleware: (getDefaultMiddleware) =>
@@ -32,7 +29,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(api.middleware),
+    }),
 });
 
 

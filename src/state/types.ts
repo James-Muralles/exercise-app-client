@@ -11,33 +11,18 @@ export interface RegisterFormValues {
   }
 
   export interface Exercise {
-    Name: string;
+    name: string; 
     type: string;
     muscle: string;
     equipment: string;
     difficulty: string;
     instructions: string;
     exerciseId: number;
-  } 
-  
-export interface AuthState {
-    user: any; 
-    token: string | null;
-    isAuthenticated: boolean;
-    exercises: Exercise[];
-  };
-
-  export interface GetExercisesResponse {
-    name: string;
-    type: string;
-    muscle: string;
-    equipment: string;
-    difficulty: string;
-    instructions: string;
-    id: number;
   }
   
-
-
-
-  
+export interface AuthState {
+    user: any;
+    token: string | null;
+    isAuthenticated: boolean;
+    workoutTemplates: Exercise[];
+  };
