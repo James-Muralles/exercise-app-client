@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material';
+import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem } from '@mui/material';
 
 const HomePage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -10,6 +10,29 @@ const HomePage = () => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(-1);
   const [editTemplateIndex, setEditTemplateIndex] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [selectedType, setSelectedType] = useState('');
+  const muscleTypes = [
+    'abdominals',
+    'abductors',
+    'adductors',
+    'biceps',
+    'calves',
+    'chest',
+    'forearms',
+    'glutes',
+    'hamstrings',
+    'lats',
+    'lower_back',
+    'middle_back',
+    'neck',
+    'quadriceps',
+    'traps',
+    'triceps',
+  ];
+
+  const [allExercises, setAllExercises] = useState([]);
 
   const openCreateModal = (index) => {
     setEditTemplateIndex(index);
@@ -60,32 +83,56 @@ const HomePage = () => {
     setSelectedExercises(updatedList);
   };
 
-  const getExercises = async () => {
-    setLoading(true);
-    try {
-      const exerciseResponse = await fetch('http://localhost:1337/exercise/exercises?limit=5', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
+  const filterExercises = () => {
+    const filteredExercises = allExercises.filter((exercise) => {
+      const isMatchingName = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const isMatchingType = !selectedType || exercise.muscle === selectedType;
+      return isMatchingName && isMatchingType;
+    });
 
-      if (!exerciseResponse.ok) {
-        console.log('Failed to retrieve data');
-        return;
-      }
+    const startIndex = (page - 1) * 10;
+    const endIndex = startIndex + 10;
+    const paginatedExercises = filteredExercises.slice(startIndex, endIndex);
 
-      const exerciseData = await exerciseResponse.json();
-      const first10Exercises = exerciseData.slice(0, 10);
-      setExerciseList(first10Exercises);
-    } catch (error) {
-      console.error('An error occurred while retrieving data:', error);
-    } finally {
-      setLoading(false);
+    setExerciseList(paginatedExercises);
+  };
+
+  const previousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
     }
+  };
+
+  const nextPage = () => {
+    if (exerciseList.length === 10) {
+      setPage(page + 1);
+    }
+  };
+
+  const resetExerciseList = () => {
+    setExerciseList([]);
   };
 
   useEffect(() => {
     if (openModal) {
-      getExercises();
+      resetExerciseList();
+      filterExercises();
+    }
+  }, [openModal, selectedType, searchTerm, page]);
+
+  useEffect(() => {
+    if (openModal) {
+      
+      fetch('http://localhost:1337/exercise/exercises?limit=999', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((data) => setAllExercises(data))
+        .catch((error) => {
+          console.error('An error occurred while retrieving data:', error);
+        });
+        
     }
   }, [openModal]);
 
@@ -93,12 +140,7 @@ const HomePage = () => {
     <div>
       <button onClick={() => openCreateModal(-1)}>Create a Workout Template</button>
       <button onClick={deleteTemplate} disabled={selectedTemplateIndex < 0}>Delete Template</button>
-      <button
-        onClick={() => openCreateModal(selectedTemplateIndex)}
-        disabled={selectedTemplateIndex < 0}
-      >
-        Edit Template
-      </button>
+      <button onClick={() => openCreateModal(selectedTemplateIndex)} disabled={selectedTemplateIndex < 0}>Edit Template</button>
 
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box sx={{ width: 400, bgcolor: 'background.paper', padding: 2 }}>
@@ -106,6 +148,24 @@ const HomePage = () => {
           {editTemplateIndex >= 0 && (
             <Button onClick={() => openCreateModal(-1)}>Create New Template</Button>
           )}
+          <TextField
+            label="Exercise Name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <TextField
+            select
+            label="Muscle Type"
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+          >
+            <MenuItem value="">All</MenuItem>
+            {muscleTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -122,7 +182,7 @@ const HomePage = () => {
                     <TableRow key={exercise.id}>
                       <TableCell>{exercise.name}</TableCell>
                       <TableCell>
-                        {selectedExercises.some((e) => e.id === exercise.id) ? (
+                        {editTemplateIndex < 0 && selectedExercises.some((e) => e.id === exercise.id) ? (
                           <button onClick={() => removeExercise(exercise)}>Remove</button>
                         ) : (
                           <button onClick={() => addExercise(exercise)}>Add</button>
@@ -139,9 +199,14 @@ const HomePage = () => {
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)}
           />
-          <Button onClick={createWorkout}>
-            {editTemplateIndex >= 0 ? 'Save Template' : 'Create Template'}
-          </Button>
+          <Button onClick={createWorkout}>{editTemplateIndex >= 0 ? 'Save Template' : 'Create Template'}</Button>
+          {exerciseList.length === 10 && (
+            <div>
+              <button onClick={previousPage}>Previous</button>
+              <span>Page {page}</span>
+              <button onClick={nextPage}>Next</button>
+            </div>
+          )}
         </Box>
       </Modal>
 
@@ -153,16 +218,13 @@ const HomePage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Exercise Name</TableCell>
-                  <TableCell>Action</TableCell>
+                  {/* <TableCell>Action</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {templates[selectedTemplateIndex].exercises.map((exercise) => (
                   <TableRow key={exercise.id}>
                     <TableCell>{exercise.name}</TableCell>
-                    <TableCell>
-                      <button onClick={() => removeExercise(exercise)}>Remove</button>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -173,11 +235,7 @@ const HomePage = () => {
 
       <div>
         {templates.map((template, index) => (
-          <button
-            key={index}
-            onClick={() => setSelectedTemplateIndex(index)}
-            disabled={selectedTemplateIndex === index}
-          >
+          <button key={index} onClick={() => setSelectedTemplateIndex(index)}>
             {template.name}
           </button>
         ))}
