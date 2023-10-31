@@ -33,6 +33,8 @@ const HomePage = () => {
   ];
 
   const [allExercises, setAllExercises] = useState([]);
+  const [modalClosed, setModalClosed] = useState(false);
+
 
   const openCreateModal = (index) => {
     setEditTemplateIndex(index);
@@ -117,13 +119,22 @@ const HomePage = () => {
     if (openModal) {
       resetExerciseList();
       filterExercises();
+      setModalClosed(false); 
+    } else if (modalClosed) {
+      setPage(1); 
+      setModalClosed(false); 
     }
-  }, [openModal, selectedType, searchTerm, page]);
+  }, [openModal, selectedType, searchTerm, page, modalClosed]);
 
+
+  const closeModal = () => {
+    setOpenModal(false);
+    setModalClosed(true); 
+  };
   useEffect(() => {
     if (openModal) {
       
-      fetch('http://localhost:1337/exercise/exercises?limit=999', {
+      fetch('http://localhost:1337/exercise/exercises?limit=10', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -142,7 +153,7 @@ const HomePage = () => {
       <button onClick={deleteTemplate} disabled={selectedTemplateIndex < 0}>Delete Template</button>
       <button onClick={() => openCreateModal(selectedTemplateIndex)} disabled={selectedTemplateIndex < 0}>Edit Template</button>
 
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+      <Modal open={openModal} onClose={closeModal}>
         <Box sx={{ width: 400, bgcolor: 'background.paper', padding: 2 }}>
           <h2>{editTemplateIndex >= 0 ? 'Edit Template' : 'Create a Workout Template'}</h2>
           {editTemplateIndex >= 0 && (
@@ -200,13 +211,15 @@ const HomePage = () => {
             onChange={(e) => setTemplateName(e.target.value)}
           />
           <Button onClick={createWorkout}>{editTemplateIndex >= 0 ? 'Save Template' : 'Create Template'}</Button>
-          {exerciseList.length === 10 && (
-            <div>
-              <button onClick={previousPage}>Previous</button>
-              <span>Page {page}</span>
-              <button onClick={nextPage}>Next</button>
-            </div>
+          <div>
+          {page > 1 && (
+          <button onClick={previousPage}>Previous</button>
           )}
+          <span>Page {page}</span>
+          {exerciseList.length === 10 && (
+          <button onClick={nextPage}>Next</button>
+          )}
+</div>
         </Box>
       </Modal>
 
@@ -218,6 +231,10 @@ const HomePage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Exercise Name</TableCell>
+                  <TableCell>Muscle</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Difficulty</TableCell>
+                  <TableCell>Instructions</TableCell>
                   {/* <TableCell>Action</TableCell> */}
                 </TableRow>
               </TableHead>
@@ -225,6 +242,10 @@ const HomePage = () => {
                 {templates[selectedTemplateIndex].exercises.map((exercise) => (
                   <TableRow key={exercise.id}>
                     <TableCell>{exercise.name}</TableCell>
+                    <TableCell>{exercise.muscle}</TableCell>
+                    <TableCell>{exercise.type}</TableCell>
+                    <TableCell>{exercise.difficulty}</TableCell>
+                    <TableCell>{exercise.instructions}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
