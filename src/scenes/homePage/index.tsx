@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem } from '@mui/material';
+import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Checkbox } from '@mui/material';
+import { CheckBox } from '@mui/icons-material';
+import { Exercise } from '@/state/types';
 
 const HomePage = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [exerciseList, setExerciseList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [templateName, setTemplateName] = useState('');
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState<{ name: string; exercises: Exercise[] }[]>([]);
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(-1);
   const [editTemplateIndex, setEditTemplateIndex] = useState(-1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,13 +36,65 @@ const HomePage = () => {
 
   const [allExercises, setAllExercises] = useState([]);
   const [modalClosed, setModalClosed] = useState(false);
-  const [showWorkoutSession, setShowWorkoutSession] = useState(false); // New state variable
+  const [showWorkoutSession, setShowWorkoutSession] = useState(false); 
+  const [workoutSessionStartTime, setWorkoutSessionStartTime] = useState<Date | null>(null);
+  const [workoutSessionStartDate, setWorkoutSessionStartDate] = useState<Date | null>(null);
+  const [showCompletedWorkoutSession, setShowCompletedWorkoutSession] = useState(false); 
+  const [workoutSessionEndTime, setWorkoutSessionEndTime] = useState<Date | null>(null);
+  const [workoutSessionEndtDate, setWorkoutSessionEndDate] = useState<Date | null>(null);
+  const [workoutSessionActive, setWorkoutSessionActive] = useState(false);
+  const [sessionCompleted, setSessionCompleted] = useState(null);
+
+
+
+const isTimeValid = (time) => {
+    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+    return timeRegex.test(time);
+  }
+
+  const formatDate = (date) => {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+  const formatTime = (date) => {
+    const options = { hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleTimeString(undefined, options);
+  }
+
+
+  const startWorkoutSessionDate = () => {
+    const sessionStartDate = new Date();
+    setWorkoutSessionStartDate(formatDate(sessionStartDate));
+    setShowWorkoutSession(true);
+    console.log(sessionStartDate)
+  };
+
+  const startWorkoutSessionStartTime = () => {
+    const sessionStartTime = new Date();
+    setWorkoutSessionStartTime(formatTime(sessionStartTime));
+    console.log(formatTime(sessionStartTime));
+  }
+
+  const endWorkoutSessionDate = () => {
+    const sessionEndDate = new Date();
+    setWorkoutSessionEndDate(formatDate(sessionEndDate));
+    setShowWorkoutSession(true);
+    console.log(sessionEndDate)
+  };
+
+  const endWorkoutSessionStartTime = () => {
+    const sessionEndTime = new Date();
+    setWorkoutSessionEndTime(formatTime(sessionEndTime));
+    console.log(formatTime(sessionEndTime));
+  }
+  
 
   const openCreateModal = (index) => {
-    setEditTemplateIndex(index);
     if (index >= 0) {
+      setEditTemplateIndex(index);
       setTemplateName(templates[index].name);
-      setSelectedExercises(templates[index].exercises);
+      // Set selectedExercises by spreading the exercises from the selected template
+      setSelectedExercises([...templates[index].exercises]);
     } else {
       setTemplateName('');
       setSelectedExercises([]);
@@ -52,11 +106,13 @@ const HomePage = () => {
     if (templateName && selectedExercises.length > 0) {
       const newTemplate = { name: templateName, exercises: selectedExercises };
       if (editTemplateIndex >= 0) {
+        // If editTemplateIndex is >= 0, it's an edit operation
         const updatedTemplates = [...templates];
         updatedTemplates[editTemplateIndex] = newTemplate;
         setTemplates(updatedTemplates);
         setEditTemplateIndex(-1);
       } else {
+        // Otherwise, it's a new template
         setTemplates([...templates, newTemplate]);
       }
       setTemplateName('');
@@ -64,6 +120,7 @@ const HomePage = () => {
       setOpenModal(false);
     }
   };
+  
 
   const deleteTemplate = () => {
     if (selectedTemplateIndex >= 0) {
@@ -74,19 +131,19 @@ const HomePage = () => {
     }
   };
 
-  const addExercise = (exercise) => {
+  const addExercise = (exercise: Exercise) => {
     if (!selectedExercises.some((e) => e.id === exercise.id)) {
       setSelectedExercises([...selectedExercises, exercise]);
     }
   };
 
-  const removeExercise = (exercise) => {
+  const removeExercise = (exercise: Exercise) => {
     const updatedList = selectedExercises.filter((selected) => selected.id !== exercise.id);
     setSelectedExercises(updatedList);
   };
 
   const filterExercises = () => {
-    const filteredExercises = allExercises.filter((exercise) => {
+    const filteredExercises = allExercises.filter((exercise: Exercise) => {
       const isMatchingName = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
       const isMatchingType = !selectedType || exercise.muscle === selectedType;
       return isMatchingName && isMatchingType;
@@ -144,19 +201,42 @@ const HomePage = () => {
     }
   }, [openModal]);
 
+  const endWorkoutSession = () => {
+    // Logic to end the workout session and save the completed session
+    setSessionCompleted({
+      startTime: workoutSessionStartTime,
+      endTime: workoutSessionEndTime,
+      exercises: templates[selectedTemplateIndex].exercises,
+    });
+    setWorkoutSessionActive(false);
+  };
+
+  
+
   return (
     <div>
       <button onClick={() => openCreateModal(-1)}>Create a Workout Template</button>
       <button onClick={deleteTemplate} disabled={selectedTemplateIndex < 0}>Delete Template</button>
-      <button onClick={() => openCreateModal(selectedTemplateIndex)} disabled={selectedTemplateIndex < 0}>Edit Template</button>
-      <button onClick={() => setShowWorkoutSession(true)} disabled={selectedTemplateIndex < 0}>Create Workout Session</button>
+      <button onClick={() => {openCreateModal(editTemplateIndex); console.log(selectedTemplateIndex)} }disabled={selectedTemplateIndex < 0}>Edit Template</button>
+      <button onClick={() => {
+        setShowWorkoutSession(true)
+        startWorkoutSessionDate()
+        startWorkoutSessionStartTime()
+       }} disabled={selectedTemplateIndex < 0}>Start Workout Session</button>
+      <button onClick={() => {
+        setShowCompletedWorkoutSession(true);
+        endWorkoutSessionDate()
+        endWorkoutSessionStartTime()
+        endWorkoutSession()
+      }}>End Workout Session</button>
+
 
       <Modal open={openModal} onClose={closeModal}>
         <Box sx={{ width: 400, bgcolor: 'background.paper', padding: 2 }}>
           <h2>{editTemplateIndex >= 0 ? 'Edit Template' : 'Create a Workout Template'}</h2>
-          {editTemplateIndex >= 0 && (
+          {/* {editTemplateIndex >= 0 && (
             <button onClick={() => openCreateModal(-1)}>Create New Template</button>
-          )}
+          )} */}
           <TextField
             label="Exercise Name"
             value={searchTerm}
@@ -186,20 +266,27 @@ const HomePage = () => {
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
+               
+                  
                 <TableBody>
-                  {exerciseList.map((exercise) => (
-                    <TableRow key={exercise.id}>
-                      <TableCell>{exercise.name}</TableCell>
-                      <TableCell>
-                        {editTemplateIndex < 0 && selectedExercises.some((e) => e.id === exercise.id) ? (
-                          <button onClick={() => removeExercise(exercise)}>Remove</button>
-                        ) : (
-                          <button onClick={() => addExercise(exercise)}>Add</button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+  {exerciseList.map((exercise: Exercise) => (
+    <TableRow key={exercise.id}>
+      <TableCell>{exercise.name}</TableCell>
+      <TableCell>
+        {editTemplateIndex >= 0 ? (
+          selectedExercises.some((e) => e.id === exercise.id) ? (
+            <button onClick={() => removeExercise(exercise)}>Remove</button>
+          ) : (
+            <button onClick={() => addExercise(exercise)}>Add</button>
+          )
+        ) : (
+          <button onClick={() => removeExercise(exercise)}>Remove</button>
+        )}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
               </Table>
             </TableContainer>
           )}
@@ -248,20 +335,51 @@ const HomePage = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          {showWorkoutSession && ( // Conditionally render the Workout Session table
-            <div>
-              <h2>Workout Session</h2>
+          {showWorkoutSession && (
+        <div>
+          <h2>
+            Workout Session{' '}
+            {workoutSessionStartTime && (
+              <span style={{ fontSize: '14px', color: 'gray' }}>
+                Started at {workoutSessionStartTime.toLocaleString()}
+                <span> </span>
+                <span style={{ fontSize: '14px', color: 'gray' }}>
+                on {workoutSessionStartDate.toLocaleString()}
+              </span>
+              </span>
+              
+            )}
+          </h2>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>Exercise Name</TableCell>
+                      <TableCell>Reps</TableCell>
+                      <TableCell>Duration</TableCell>
+                      <TableCell>Notes</TableCell>
+                      <TableCell>Completed</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {templates[selectedTemplateIndex].exercises.map((exercise) => (
                       <TableRow key={exercise.id}>
                         <TableCell>{exercise.name}</TableCell>
+                        <TableCell>
+                            <TextField type="number" label="Reps" variant="outlined" />
+                        </TableCell>
+                        <TableCell>
+                            <TextField 
+                            label="Duration" 
+                            variant="outlined" 
+                             />
+                        </TableCell>
+                        <TableCell>
+                            <TextField label="Notes" variant="outlined" />
+                        </TableCell>
+                        <TableCell>
+                            <Checkbox/>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -269,6 +387,7 @@ const HomePage = () => {
               </TableContainer>
             </div>
           )}
+          
         </div>
       )}
 
@@ -279,6 +398,53 @@ const HomePage = () => {
           </button>
         ))}
       </div>
+
+      {sessionCompleted && (
+        <div>
+          <h2>
+            Session Completed{' '}
+            {sessionCompleted.startTime && sessionCompleted.endTime && (
+              <span style={{ fontSize: '14px', color: 'gray' }}>
+                Started at {sessionCompleted.startTime.toLocaleString()}
+                <span> </span>
+                Ended at {sessionCompleted.endTime.toLocaleString()}
+              </span>
+            )}
+          </h2>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Exercise Name</TableCell>
+                  <TableCell>Reps</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Notes</TableCell>
+                  <TableCell>Completed</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sessionCompleted.exercises.map((exercise) => (
+                  <TableRow key={exercise.id}>
+                    <TableCell>{exercise.name}</TableCell>
+                    <TableCell>
+                      <TextField type="number" label="Reps" variant="outlined" />
+                    </TableCell>
+                    <TableCell>
+                      <TextField label="Duration" variant="outlined" />
+                    </TableCell>
+                    <TableCell>
+                      <TextField label="Notes" variant="outlined" />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
     </div>
   );
 };
