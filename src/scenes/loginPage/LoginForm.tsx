@@ -50,6 +50,9 @@ const login = async (values: LoginFormValues, onSubmitProps: { resetForm: () => 
         token: loggedIn.token,
       })
     );
+
+          navigate('/createTemplate');
+
     
   } catch (error) {
     // Handle network errors or other issues

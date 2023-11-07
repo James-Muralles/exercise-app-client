@@ -6,8 +6,7 @@ const initialState: AuthState = {
   token: null,
   isAuthenticated: false,
   workoutTemplates: [],
-  // Add a new state to track the workout session
-  workoutSession: null,
+  // workoutSession: null,
 };
 
 export const authSlice = createSlice({
@@ -19,20 +18,21 @@ export const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.workoutTemplates = [];
-      state.workoutSession = null; // Initialize workout session to null
+      // state.workoutSession = null; 
     },
     setLogout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.workoutTemplates = [];
-      state.workoutSession = null; // Clear the workout session on logout
+      // state.workoutSession = null; 
     },
     createWorkoutTemplate: (state, action) => {
-      const { name, exercises } = action.payload;
+      const { name, exercises, user } = action.payload;
       state.workoutTemplates.push({
         name,
         exercises: exercises,
+        user,
       });
     },
     renameWorkoutTemplate: (state, action) => {
@@ -48,24 +48,23 @@ export const authSlice = createSlice({
       state.workoutTemplates[templateIndex].exercises.splice(exerciseIndex, 1);
     },
     // Add a new reducer to start a workout session
-    startWorkoutSession: (state, action) => {
-      const selectedTemplate = state.workoutTemplates[action.payload.templateIndex];
-      state.workoutSession = {
-        template: selectedTemplate,
-        timestamp: new Date().toLocaleString(),
-        exercises: selectedTemplate.exercises.map((exercise) => ({
-          name: exercise.name,
-          reps: "",
-          duration: "",
-          notes: "",
-        })),
-      };
-    },
-    // Add a reducer to save workout session data
-    saveWorkoutSession: (state) => {
-      // Implement logic to save the workout session data
-      // You can save it to a backend or update the state as needed.
-    },
+    // startWorkoutSession: (state, action) => {
+    //   const selectedTemplate = state.workoutTemplates[action.payload.templateIndex];
+    //   state.workoutSession = {
+    //     template: selectedTemplate,
+    //     timestamp: new Date().toLocaleString(),
+    //     exercises: selectedTemplate.exercises.map((exercise) => ({
+    //       name: exercise.name,
+    //       reps: "",
+    //       duration: "",
+    //       notes: "",
+    //     })),
+    //   };
+    // },
+    // // Add a reducer to save workout session data
+    // saveWorkoutSession: (state) => {
+    //   //  save it to a backend or update the state as needed.
+    // },
   },
 });
 
@@ -76,7 +75,7 @@ export const {
   renameWorkoutTemplate,
   addExerciseToTemplate,
   removeExerciseFromTemplate,
-  startWorkoutSession,
-  saveWorkoutSession,
+  // startWorkoutSession,
+  // saveWorkoutSession,
 } = authSlice.actions;
 export default authSlice.reducer;
