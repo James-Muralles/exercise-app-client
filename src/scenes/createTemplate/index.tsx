@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem } from '@mui/material';
+import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select } from '@mui/material';
 import { Exercise } from '@/state/types';
 import { useDispatch, useSelector } from 'react-redux';
-import state, { createWorkoutTemplate } from '@/state';
+import state, { createWorkoutTemplate, setUserTemplates } from '@/state';
 
 const CreateTemplatePage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -10,6 +10,8 @@ const CreateTemplatePage = () => {
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [exerciseList, setExerciseList] = useState([]);
   const [allExercises, setAllExercises] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   const [modalClosed, setModalClosed] = useState(false);
 
@@ -38,19 +40,48 @@ const CreateTemplatePage = () => {
     'triceps',
   ];
 
+  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string; exercises: Exercise[] } | null>(null);
+  const [selectedTemplateName, setSelectedTemplateName] = useState(''); state
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(-1);
   const [editTemplateIndex, setEditTemplateIndex] = useState(-1);
 
   const dispatch = useDispatch();//redux
   const workoutTemplates = useSelector((state) => state.workoutTemplates);//redux
   const userId = useSelector((state) => state.user._id); 
+  const authToken = useSelector((state) => state.token); 
   
+
+const user = useSelector((state) => state.user);
+
+
+useEffect(() => {
+  if (userId && authToken) {
+    fetch('http://localhost:1337/templates/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(setUserTemplates(data));
+        setTemplates(data);
+        setIsLoading(false);
+        console.log(templates);
+      })
+      .catch((error) => {
+        console.error('Error fetching user templates:', error);
+        setIsLoading(false); 
+      });
+  }
+}, [userId, authToken, dispatch]);
 
 
   const openCreateModal = () => {
     setOpenModal(true);
+   
   };
-
   const closeModal = () => {
     setOpenModal(false);
     setModalClosed(true); 
@@ -89,6 +120,15 @@ const CreateTemplatePage = () => {
       setOpenModal(false);
     }
   };
+
+  const handleTemplateSelect = (e) => {
+    const selectedTemplateName = e.target.value;
+    setSelectedTemplateName(selectedTemplateName);
+
+    const selectedTemplate = templates.find((template) => template.name === selectedTemplateName);
+
+    setSelectedTemplate(selectedTemplate);
+  };
   
   
 
@@ -116,6 +156,8 @@ const CreateTemplatePage = () => {
     const updatedList = selectedExercises.filter((selected) => selected.id !== exercise.id);
     setSelectedExercises(updatedList);
   };
+
+  
 
 
   useEffect(() => {
@@ -217,6 +259,44 @@ const CreateTemplatePage = () => {
           <Button onClick={createWorkout}>Create Template</Button>
         </Box>
       </Modal>
+      {/* Dropdown for selecting templates */}
+      <Select value={selectedTemplateName} onChange={handleTemplateSelect}>
+        <MenuItem value="">Select a Template</MenuItem>
+        {templates.map((template) => (
+          <MenuItem key={template.name} value={template.name}>
+            {template.name}
+          </MenuItem>
+        ))}
+      </Select>
+      {selectedTemplate && (
+        <div>
+          <h3>Selected Template: {selectedTemplate.name}</h3>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Exercise Name</TableCell>
+                  <TableCell>Exercise Type</TableCell>
+                  <TableCell>Exercise Muscle</TableCell>
+                  <TableCell>Exercise Difficulty</TableCell>
+                  <TableCell>Exercise Instructions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectedTemplate.exercises.map((exercise) => (
+                  <TableRow key={exercise.id}>
+                    <TableCell>{exercise.name}</TableCell>
+                    <TableCell>{exercise.type}</TableCell>
+                    <TableCell>{exercise.muscle}</TableCell>
+                    <TableCell>{exercise.difficulty}</TableCell>
+                    <TableCell>{exercise.instructions}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
 
       {/* The table for displaying workout templates goes here */}
     </div>

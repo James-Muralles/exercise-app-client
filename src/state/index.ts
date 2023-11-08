@@ -47,6 +47,9 @@ export const authSlice = createSlice({
       const { templateIndex, exerciseIndex } = action.payload;
       state.workoutTemplates[templateIndex].exercises.splice(exerciseIndex, 1);
     },
+    setUserTemplates: (state, action) => {
+      state.workoutTemplates = action.payload;
+    },
     // Add a new reducer to start a workout session
     // startWorkoutSession: (state, action) => {
     //   const selectedTemplate = state.workoutTemplates[action.payload.templateIndex];
@@ -75,6 +78,7 @@ export const {
   renameWorkoutTemplate,
   addExerciseToTemplate,
   removeExerciseFromTemplate,
+  setUserTemplates,
   // startWorkoutSession,
   // saveWorkoutSession,
 } = authSlice.actions;
