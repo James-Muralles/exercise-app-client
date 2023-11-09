@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select } from '@mui/material';
-import { Exercise } from '@/state/types';
+import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { AuthState, Exercise } from '@/state/types';
 import { useDispatch, useSelector } from 'react-redux';
 import state, { createWorkoutTemplate, setUserTemplates } from '@/state';
 
@@ -12,12 +12,10 @@ const CreateTemplatePage = () => {
   const [allExercises, setAllExercises] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
   const [modalClosed, setModalClosed] = useState(false);
 
   const [templates, setTemplates] = useState<{ name: string; exercises: Exercise[] }[]>([]); 
   const [loading, setLoading] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [selectedType, setSelectedType] = useState('');
@@ -40,48 +38,87 @@ const CreateTemplatePage = () => {
     'triceps',
   ];
 
-  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string; exercises: Exercise[] } | null>(null);
-  const [selectedTemplateName, setSelectedTemplateName] = useState(''); state
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    [x: string]: any; name: string; exercises: Exercise[] 
+} | null>(null);
+  const [selectedTemplateName, setSelectedTemplateName] = useState('');
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(-1);
   const [editTemplateIndex, setEditTemplateIndex] = useState(-1);
 
+  const [isEditingTemplate, setIsEditingTemplate] = useState(false);
+  const [editedTemplateName, setEditedTemplateName] = useState('');
+  const [editedExercises, setEditedExercises] = useState<Exercise[]>([]);
+
   const dispatch = useDispatch();//redux
-  const workoutTemplates = useSelector((state) => state.workoutTemplates);//redux
-  const userId = useSelector((state) => state.user._id); 
-  const authToken = useSelector((state) => state.token); 
+  const workoutTemplates = useSelector((state: AuthState) => state.workoutTemplates);//redux
+  const userId = useSelector((state: AuthState) => state.user._id); 
+  const authToken = useSelector((state: AuthState) => state.token); 
+
   
 
-const user = useSelector((state) => state.user);
 
-
-useEffect(() => {
-  if (userId && authToken) {
-    fetch('http://localhost:1337/templates/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        dispatch(setUserTemplates(data));
-        setTemplates(data);
-        setIsLoading(false);
-        console.log(templates);
+  useEffect(() => {
+    if (userId && authToken) {
+      fetch('http://localhost:1337/templates/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
       })
-      .catch((error) => {
-        console.error('Error fetching user templates:', error);
-        setIsLoading(false); 
-      });
-  }
-}, [userId, authToken, dispatch]);
+        .then((response) => response.json())
+        .then((data) => {
+          dispatch(setUserTemplates(data));
+          setTemplates(data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching user templates:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [userId, authToken, dispatch, setTemplates]);
+  
+  // Update selected template separately
+  useEffect(() => {
+    if (selectedTemplateName && templates.length > 0) {
+      const selectedTemplate = templates.find((template) => template.name === selectedTemplateName);
+      if (selectedTemplate) {
+        setSelectedTemplate(selectedTemplate);
+      }
+    }
+  }, [selectedTemplateName, templates]);
+  
+  
 
+  useEffect(() => {
+    if (openModal) {
+      filterExercises();
+      setModalClosed(false); 
+    } else if (modalClosed) {
+      setPage(1); 
+      setModalClosed(false); 
+    }
+  }, [openModal, selectedType, searchTerm, page, modalClosed]);
+
+  useEffect(() => {
+    if (openModal) {
+      fetch('http://localhost:1337/exercise/exercises?limit=10', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((data) => setAllExercises(data))
+        .catch((error) => {
+          console.error('An error occurred while retrieving data:', error);
+        });
+    }
+  }, [openModal,templates]);
 
   const openCreateModal = () => {
     setOpenModal(true);
-   
   };
+
   const closeModal = () => {
     setOpenModal(false);
     setModalClosed(true); 
@@ -96,7 +133,6 @@ useEffect(() => {
       }
   
       dispatch(createWorkoutTemplate(newTemplate));
-      console.log(newTemplate)
   
       fetch('http://localhost:1337/templates/templates', {
         method: 'POST',
@@ -109,7 +145,6 @@ useEffect(() => {
         .then((data) => {
           const createdTemplate = data;
           dispatch(createWorkoutTemplate(createdTemplate));
-          console.log(createdTemplate)
         })
         .catch((error) => {
           console.error('An error occurred while creating the template:', error);
@@ -121,17 +156,23 @@ useEffect(() => {
     }
   };
 
-  const handleTemplateSelect = (e) => {
+  const handleTemplateSelect = (e: SelectChangeEvent<string>) => {
     const selectedTemplateName = e.target.value;
     setSelectedTemplateName(selectedTemplateName);
-
-    const selectedTemplate = templates.find((template) => template.name === selectedTemplateName);
-
-    setSelectedTemplate(selectedTemplate);
+  
+    if (isEditingTemplate) {
+      const selectedTemplate = templates.find((template) => template.name === selectedTemplateName);  
+      if (selectedTemplate) {
+        setEditedTemplateName(selectedTemplate.name);
+        setEditedExercises(selectedTemplate.exercises);
+        setSelectedTemplate(selectedTemplate || null);
+      }
+    } else {
+      const selectedTemplate = templates.find((template) => template.name === selectedTemplateName);  
+      setSelectedTemplate(selectedTemplate || null);
+    }
   };
   
-  
-
   const filterExercises = () => {
     const filteredExercises = allExercises.filter((exercise: Exercise) => {
       const isMatchingName = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -157,35 +198,91 @@ useEffect(() => {
     setSelectedExercises(updatedList);
   };
 
+  const saveEditedTemplate = () => {
+    if (selectedTemplate) {
+      const updatedTemplate = {
+        name: editedTemplateName,
+        exercises: editedExercises.map((exercise) => exercise.id),
+        user: userId,
+      };
   
-
-
-  useEffect(() => {
-    if (openModal) {
-      // resetExerciseList();
-      filterExercises();
-      setModalClosed(false); 
-    } else if (modalClosed) {
-      setPage(1); 
-      setModalClosed(false); 
-    }
-  }, [openModal, selectedType, searchTerm, page, modalClosed]);
-
-  
-
-  useEffect(() => {
-    if (openModal) {
-      fetch('http://localhost:1337/exercise/exercises?limit=10', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+      fetch(`http://localhost:1337/templates/edit/${selectedTemplate.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(updatedTemplate),
       })
         .then((response) => response.json())
-        .then((data) => setAllExercises(data))
+        .then((data) => {
+          const updatedTemplates = templates.map((template) =>
+            template.name === selectedTemplate.name ? data : template
+          );
+  
+          dispatch(setUserTemplates(updatedTemplates));
+          setTemplates(updatedTemplates);
+          setSelectedTemplate(null);
+          
+          fetch('http://localhost:1337/templates/', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`,
+            },
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            dispatch(setUserTemplates(data));
+            setTemplates(data);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error('Error fetching user templates:', error);
+            setIsLoading(false);
+            dispatch(setUserTemplates([])); 
+            setTemplates([]);
+          });
+  
+          setOpenModal(false); 
+        })
         .catch((error) => {
-          console.error('An error occurred while retrieving data:', error);
+          console.error('An error occurred while updating the template:', error);
         });
     }
-  }, [openModal]);
+  };
+  
+  
+  
+
+  // Delete the template
+  const deleteTemplate = () => {
+    // Delete the template from your state
+    // Make a request to your API to delete it
+    // Close the modal
+    setIsEditingTemplate(false);
+    setOpenModal(false);
+  };
+
+  const openEditModal = () => {
+  setIsEditingTemplate(true);
+
+  if (selectedTemplate) {
+    setEditedTemplateName(selectedTemplate.name);
+    setEditedExercises(selectedTemplate.exercises);
+  }
+
+  setOpenModal(true);
+};
+const handleEditExercise = (exercise: Exercise) => {
+  if (editedExercises.some((e) => e.id === exercise.id)) {
+    const updatedList = editedExercises.filter((e) => e.id !== exercise.id);
+    setEditedExercises(updatedList);
+  } else {
+    setEditedExercises([...editedExercises, exercise]);
+  }
+};
+
 
   return (
     <div>
@@ -199,7 +296,6 @@ useEffect(() => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-
           <TextField
             select
             label="Muscle Type"
@@ -225,38 +321,53 @@ useEffect(() => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {exerciseList.map((exercise: Exercise) => (
-                    <TableRow key={exercise.id}>
-                      <TableCell>{exercise.name}</TableCell>
-                      <TableCell>
-                        {editTemplateIndex < 0 ? (
-                          selectedExercises.some((e) => e.id === exercise.id) ? (
-                            <button onClick={() => removeExercise(exercise)}>Remove</button>
-                          ) : (
-                            <button onClick={() => addExercise(exercise)}>Add</button>
-                          )
-                        ) : (
-                          selectedExercises.some((e) => e.id === exercise.id) ? (
-                            <button onClick={() => removeExercise(exercise)}>Remove</button>
-                          ) : (
-                            <button onClick={() => addExercise(exercise)}>Add</button>
-                          )
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {exerciseList.map((exercise: Exercise) => (
+  <TableRow key={exercise.id}>
+    <TableCell>{exercise.name}</TableCell>
+    <TableCell>
+      <button
+        onClick={() =>
+          isEditingTemplate
+            ? handleEditExercise(exercise)
+            : selectedExercises.some((e) => e.id === exercise.id)
+            ? removeExercise(exercise)
+            : addExercise(exercise)
+        }
+      >
+        {isEditingTemplate
+          ? editedExercises.some((e) => e.id === exercise.id)
+            ? 'Remove'
+            : 'Add'
+          : selectedExercises.some((e) => e.id === exercise.id)
+          ? 'Remove'
+          : 'Add'}
+      </button>
+    </TableCell>
+  </TableRow>
+))}
                 </TableBody>
-
               </Table>
             </TableContainer>
           )}
           <TextField
             label="Template Name"
-            value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)}
+            value={isEditingTemplate ? editedTemplateName : templateName}
+            onChange={(e) => {
+              if (isEditingTemplate) {
+                setEditedTemplateName(e.target.value);
+              } else {
+                setTemplateName(e.target.value);
+              }
+            }}
           />
+          
 
-          <Button onClick={createWorkout}>Create Template</Button>
+          <Button onClick={isEditingTemplate ? saveEditedTemplate : createWorkout}>
+            {isEditingTemplate ? 'Save Template' : 'Create Template'}
+          </Button>
+          {isEditingTemplate && (
+            <Button onClick={deleteTemplate}>Delete Template</Button>
+          )}
         </Box>
       </Modal>
       {/* Dropdown for selecting templates */}
@@ -271,6 +382,7 @@ useEffect(() => {
       {selectedTemplate && (
         <div>
           <h3>Selected Template: {selectedTemplate.name}</h3>
+          <button onClick={openEditModal}>Edit Template</button>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -297,7 +409,6 @@ useEffect(() => {
           </TableContainer>
         </div>
       )}
-
       {/* The table for displaying workout templates goes here */}
     </div>
   );
