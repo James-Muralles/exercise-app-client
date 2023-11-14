@@ -11,6 +11,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthState } from "./state/types"
 import WorkoutPage from "./scenes/workoutPage"
 import TemplatesPage from "./scenes/TemplatePage"
+import SessionsCompletedPage from "./scenes/completedSessionsPage"
 
 
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/Templates" element={<TemplatesPage/>}/>
           <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/login" />} />
           <Route path="/workoutStart" element={<WorkoutPage/>} />
+          <Route path="/completedSessions" element={<SessionsCompletedPage/>} />
         </Routes>
         
         </Box>

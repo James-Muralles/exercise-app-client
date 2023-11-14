@@ -18,14 +18,14 @@ export const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.workoutTemplates = [];
-      // state.workoutSession = null; 
+      state.workoutSessions = []; 
     },
     setLogout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.workoutTemplates = [];
-      // state.workoutSession = null; 
+      state.workoutSessions = []; 
     },
     createWorkoutTemplate: (state, action) => {
       const { name, exercises, user } = action.payload;

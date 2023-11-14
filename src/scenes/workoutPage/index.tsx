@@ -27,13 +27,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import state, { setWorkoutSessions } from '@/state';
 
+interface ExerciseDataItem {
+    reps: string;
+    duration: string;
+    notes: string;
+    completed: boolean;
+  }
+
 const WorkoutPage = () => {
   const location = useLocation();
   const userName = useSelector((state: AuthState) => state.user.username);
   const userId = useSelector((state: AuthState) => state.user.id);
   const templateData = location.state?.templateData;
   const [workoutCompleted, setWorkoutCompleted] = useState(false);
-  const [exerciseData, setExerciseData] = useState(
+  const [exerciseData, setExerciseData] = useState<ExerciseDataItem[]>(
     templateData.exercises.map(() => ({
       reps: '',
       duration: '',
@@ -47,7 +54,7 @@ const WorkoutPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [workoutName, setWorkoutName] = useState('');
 
-  const ExpandableCell = ({ content }) => {
+  const ExpandableCell = ({ content }: { content: React.ReactNode }) => {
     const [expanded, setExpanded] = useState(false);
 
 
@@ -57,7 +64,10 @@ const WorkoutPage = () => {
       setExpanded(!expanded);
     };
 
-    const collapsedContent = content.length > 20 ? `${content.substring(0, 20)}...` : content;
+     const collapsedContent =
+    typeof content === 'string' && content.length > 20
+      ? `${content.substring(0, 20)}...`
+      : content;
 
     return (
       <React.Fragment>
@@ -72,7 +82,7 @@ const WorkoutPage = () => {
     );
   };
 
-  const handleExerciseChange = (index, field, value) => {
+  const handleExerciseChange = (index: number, field: string, value: string | Boolean) => {
     const newData = [...exerciseData];
     newData[index] = { ...newData[index], [field]: value };
     setExerciseData(newData);
@@ -87,7 +97,7 @@ const WorkoutPage = () => {
   };
 const dispatch = useDispatch();
 const handleSaveWorkout = async () => {
-    const workoutData = templateData.exercises.map((exercise, index) => ({
+    const workoutData = templateData.exercises.map((exercise: Exercise, index: number) => ({
       ...exercise,
       ...exerciseData[index],
     }));
@@ -96,7 +106,7 @@ const handleSaveWorkout = async () => {
       user: userId,
       name: workoutName,
       template: templateData.id,
-      exercises: workoutData.map(({ id, reps, duration, notes, completed }) => ({
+      exercises: workoutData.map(({ id, reps, duration, notes, completed }: any) => ({
         exercise: id,
         reps,
         duration,
