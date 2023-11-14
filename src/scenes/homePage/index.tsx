@@ -9,14 +9,14 @@ const HomePage = () => {
 
     const handleTemplatesClick = ()=> {
 
-        navigate('/createTemplate');
+        navigate('/Templates');
     }
 
 
   return (
     <div>
         <h1>Hello, {userName}!</h1>
-        <Link to='/createTemplate'>Templates</Link>
+        <Link to='/Templates'>Templates</Link>
       
     </div>
   )

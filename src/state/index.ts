@@ -6,7 +6,7 @@ const initialState: AuthState = {
   token: null,
   isAuthenticated: false,
   workoutTemplates: [],
-  // workoutSession: null,
+  workoutSessions: []
 };
 
 export const authSlice = createSlice({
@@ -50,24 +50,11 @@ export const authSlice = createSlice({
     setUserTemplates: (state, action) => {
       state.workoutTemplates = action.payload;
     },
-    // Add a new reducer to start a workout session
-    // startWorkoutSession: (state, action) => {
-    //   const selectedTemplate = state.workoutTemplates[action.payload.templateIndex];
-    //   state.workoutSession = {
-    //     template: selectedTemplate,
-    //     timestamp: new Date().toLocaleString(),
-    //     exercises: selectedTemplate.exercises.map((exercise) => ({
-    //       name: exercise.name,
-    //       reps: "",
-    //       duration: "",
-    //       notes: "",
-    //     })),
-    //   };
-    // },
+    
     // // Add a reducer to save workout session data
-    // saveWorkoutSession: (state) => {
-    //   //  save it to a backend or update the state as needed.
-    // },
+    setWorkoutSessions: (state, action) => {
+      state.workoutSessions = action.payload;
+        },
   },
 });
 
@@ -80,6 +67,6 @@ export const {
   removeExerciseFromTemplate,
   setUserTemplates,
   // startWorkoutSession,
-  // saveWorkoutSession,
+  setWorkoutSessions,
 } = authSlice.actions;
 export default authSlice.reducer;

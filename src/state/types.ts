@@ -9,8 +9,17 @@ export interface User  {
 export interface WorkoutTemplate  {
   name: string;
   exercises: Exercise[];
-  user: string; // Assuming 'user' is of type string
+  user: string; 
 };
+
+export interface WorkoutSession {
+  name: string;
+  templateId: string;
+  user: string ;
+  exercises: [];
+  completed: boolean;
+
+}
 
 export interface LoginFormValues {
     username: string;
@@ -40,6 +49,7 @@ export interface AuthState {
     token: string | null;
     isAuthenticated: boolean;
     workoutTemplates: WorkoutTemplate[];
+    workoutSessions: WorkoutSession[];
   
   };
 

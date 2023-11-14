@@ -3,8 +3,10 @@ import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableH
 import { AuthState, Exercise } from '@/state/types';
 import { useDispatch, useSelector } from 'react-redux';
 import state, { createWorkoutTemplate, setUserTemplates } from '@/state';
+import { Link, useNavigate } from 'react-router-dom';
 
-const CreateTemplatePage = () => {
+
+const TemplatesPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
@@ -54,7 +56,7 @@ const CreateTemplatePage = () => {
   const userId = useSelector((state: AuthState) => state.user._id); 
   const authToken = useSelector((state: AuthState) => state.token); 
 
-  
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -180,9 +182,6 @@ const CreateTemplatePage = () => {
     }
   };
   
-  
-  
-
 
   const handleTemplateSelect = (e: SelectChangeEvent<string>) => {
     const selectedTemplateName = e.target.value;
@@ -335,6 +334,17 @@ const handleEditExercise = (exercise: Exercise) => {
     setEditedExercises([...editedExercises, exercise]);
   }
 };
+const handleStartWorkoutClick = () => {
+
+  if (selectedTemplate) {
+    navigate('/workoutStart', {
+      state: { templateData: selectedTemplate },
+    });
+  } else {
+    console.error('No template selected to start the workout');
+  }
+};
+
 
 
   return (
@@ -436,6 +446,7 @@ const handleEditExercise = (exercise: Exercise) => {
         <div>
           <h3>Selected Template: {selectedTemplate.name}</h3>
           <button onClick={openEditModal}>Edit Template</button>
+          <button onClick={handleStartWorkoutClick}>Start Workout</button>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -467,4 +478,4 @@ const handleEditExercise = (exercise: Exercise) => {
   );
 };
 
-export default CreateTemplatePage;
+export default TemplatesPage;

@@ -6,10 +6,11 @@ import NavBar from "./scenes/navbar"
 import LoginPage from "@/scenes/loginPage";
 import RegisterPage from "@/scenes/registerPage";
 import HomePage from "@/scenes/homePage";
-import CreateTemplatePage from "@/scenes/createTemplate";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthState } from "./state/types"
+import WorkoutPage from "./scenes/workoutPage"
+import TemplatesPage from "./scenes/TemplatePage"
 
 
 
@@ -31,8 +32,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage/>}/>
           <Route path="/register" element={<RegisterPage/>}/>
-          <Route path="/createTemplate" element={<CreateTemplatePage/>}/>
+          <Route path="/Templates" element={<TemplatesPage/>}/>
           <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/login" />} />
+          <Route path="/workoutStart" element={<WorkoutPage/>} />
         </Routes>
         
         </Box>
