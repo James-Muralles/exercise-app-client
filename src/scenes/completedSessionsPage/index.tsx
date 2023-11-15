@@ -2,11 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { setWorkoutSessions } from '@/state';
+import { AuthState } from '@/state/types';
+
+const formatDate = (dateString: string | number | Date) => {
+    const options = {  month: 'numeric', day: 'numeric', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+  
 
 const SessionsCompleted = () => {
   const dispatch = useDispatch();
-  const workoutSessions = useSelector((state) => state.workoutSessions);
-  const authToken = useSelector((state) => state.token);
+  const workoutSessions = useSelector((state: AuthState) => state.workoutSessions);
+  const authToken = useSelector((state: AuthState) => state.token);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +57,7 @@ const SessionsCompleted = () => {
             {workoutSessions.map((session) => (
               <TableRow key={session.id}>
                 <TableCell>{session.name}</TableCell>
-                <TableCell>{session.createdAt}</TableCell>
+                <TableCell>{formatDate(session.createdAt)}</TableCell>
                 <TableCell>
                   <ul>
                     {session.exercises.map((exercise) => (

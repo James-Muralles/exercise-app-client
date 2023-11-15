@@ -27,6 +27,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import state, { setWorkoutSessions } from '@/state';
 
+interface WorkoutPageProps {
+    workoutCompleted?: boolean;
+    setWorkoutCompleted?: React.Dispatch<React.SetStateAction<boolean>>;
+  }
+
 interface ExerciseDataItem {
     reps: string;
     duration: string;
@@ -34,12 +39,12 @@ interface ExerciseDataItem {
     completed: boolean;
   }
 
-const WorkoutPage = () => {
+const WorkoutPage: React.FC<WorkoutPageProps> = ({workoutCompleted = false, setWorkoutCompleted}) => {
   const location = useLocation();
   const userName = useSelector((state: AuthState) => state.user.username);
   const userId = useSelector((state: AuthState) => state.user.id);
   const templateData = location.state?.templateData;
-  const [workoutCompleted, setWorkoutCompleted] = useState(false);
+//   const [workoutCompleted, setWorkoutCompleted] = useState(false);
   const [exerciseData, setExerciseData] = useState<ExerciseDataItem[]>(
     templateData.exercises.map(() => ({
       reps: '',
@@ -57,8 +62,6 @@ const WorkoutPage = () => {
   const ExpandableCell = ({ content }: { content: React.ReactNode }) => {
     const [expanded, setExpanded] = useState(false);
 
-
- const dispatch = useDispatch();
 
     const handleExpandClick = () => {
       setExpanded(!expanded);
@@ -129,7 +132,9 @@ const handleSaveWorkout = async () => {
       if (response.status === 201) {
         dispatch(setWorkoutSessions(sessionData));
         setOpenDialog(false);
-        setWorkoutCompleted(true);
+        if(setWorkoutCompleted){
+            setWorkoutCompleted(true);
+         }
         return;
       }
 
@@ -141,6 +146,9 @@ const handleSaveWorkout = async () => {
   const handleWorkoutCompletedDialogClose = () => {
     navigate('/completedSessions');
   };
+  
+  
+  
       
 
   return (
