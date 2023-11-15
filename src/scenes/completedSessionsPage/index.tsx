@@ -5,6 +5,7 @@ import { setWorkoutSessions } from '@/state';
 import { AuthState, WorkoutSession } from '@/state/types';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
+import { utcToZonedTime } from 'date-fns-tz';
 import ReactTooltip from 'react-tooltip';
 
 const formatDate = (dateString: string | number | Date) => {
@@ -21,12 +22,14 @@ const SessionsCompleted = () => {
     column: '',
     direction: 'asc',
   });
-
   const currentDate = new Date();
-  const startDate = new Date(currentDate);
-  startDate.setMonth(currentDate.getMonth() - 2); 
+const startDate = new Date(currentDate);
+startDate.setMonth(currentDate.getMonth() - 2);
+startDate.setUTCHours(0, 0, 0, 0); // Set to the beginning of the day in local time zone
 
-  const endDate = new Date(currentDate);
+const endDate = new Date(currentDate);
+endDate.setUTCHours(23, 59, 59, 999); // Set to the end of the day in local time zone
+
 
   useEffect(() => {
     try {
@@ -80,7 +83,15 @@ const SessionsCompleted = () => {
     return acc;
   }, {});
 
-  const heatmapData = Object.entries(dateCounts).map(([date, count]) => ({ date, count }));
+  const heatmapData = Object.entries(dateCounts).map(([date, count]) => {
+    const currentDate = new Date(date);
+    // Adding one day for heatmap display purposes
+    currentDate.setDate(currentDate.getDate() + 1);
+    const dayOfWeek = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+    return { date: currentDate.toISOString().split('T')[0], count, dayOfWeek };
+  });
+  
+
 
 
   return (
@@ -93,6 +104,8 @@ const SessionsCompleted = () => {
           endDate={endDate}
           values={heatmapData}
           tooltipDataAttrs={(value) => {
+            // console.log(value.date)
+
             return {
               'data-tip': `${formatDate(value.date)}: ${value.count} workouts`,
             };

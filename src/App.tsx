@@ -12,6 +12,7 @@ import { AuthState } from "./state/types"
 import WorkoutPage from "./scenes/workoutPage"
 import TemplatesPage from "./scenes/TemplatePage"
 import SessionsCompletedPage from "./scenes/completedSessionsPage"
+import WorkoutProgressChart from "./scenes/progressChart"
 
 
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/login" />} />
           <Route path="/workoutStart" element={workoutCompleted ? <Navigate to="/completedSessions" /> : <WorkoutPage workoutCompleted={workoutCompleted} setWorkoutCompleted={setWorkoutCompleted}/>} />
           <Route path="/completedSessions" element={<SessionsCompletedPage/>} />
+          <Route path="/progress" element={<WorkoutProgressChart/>} />
         </Routes>
         
         </Box>
