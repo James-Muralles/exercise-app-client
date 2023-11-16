@@ -13,6 +13,8 @@ export interface WorkoutTemplate  {
 };
 
 export interface WorkoutSession {
+  [x: string]: Key | null | undefined;
+  [x: string]: string | number | Date;
   name: string;
   templateId: string;
   user: string ;

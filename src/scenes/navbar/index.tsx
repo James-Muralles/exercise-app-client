@@ -34,6 +34,31 @@ const NavBar = () => {
     navigate('/register'); // Navigate to the login page
   };
 
+  const handleTemplatesClick = () => {
+    if (isMobileScreens) {
+      setIsMobileMenuToggled(false);
+    }
+    setSelectedPage('TemplatePage');
+    navigate('/templates');
+  };
+
+  const handleCompletedSessionsClick = () => {
+    if (isMobileScreens) {
+      setIsMobileMenuToggled(false);
+    }
+    setSelectedPage('completedSessionsPage');
+    navigate('/completedSessions');
+  };
+  const handleCompletedProgressClick = () => {
+    if (isMobileScreens) {
+      setIsMobileMenuToggled(false);
+    }
+    setSelectedPage('progressPage');
+    navigate('/progress');
+  };
+
+  
+
    // Use Redux to check if the user is authenticated
    const isAuthenticated = useSelector((state: AuthState ) => state.isAuthenticated);
    const dispatch = useDispatch();
@@ -82,6 +107,9 @@ const NavBar = () => {
               border: `2px solid ${palette.tertiary[500]}`,
               borderRadius: '10px',
               background: `${palette.secondary[200]}`,
+              marginBottom: '10px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
           >
             <img
@@ -94,7 +122,7 @@ const NavBar = () => {
             />
           </button>
           {isMobileMenuToggled && (
-            <div>
+            <div style={{ textAlign: 'center' }}>
               {isAuthenticated ? (
                 // Display Logout when authenticated
                 <div>
@@ -102,6 +130,43 @@ const NavBar = () => {
                     style={{
                       color: palette.grey[500],
                       textDecoration: 'inherit',
+                      margin: '5px 0',
+                    }}
+                    onClick={handleTemplatesClick}
+                  >
+                    <Typography textAlign="center" fontSize="5vh">
+                      Templates
+                    </Typography>
+                  </button>
+                  <button
+                    style={{
+                      color: palette.grey[500],
+                      textDecoration: 'inherit',
+                      margin: '5px 0',
+                    }}
+                    onClick={handleCompletedSessionsClick}
+                  >
+                    <Typography textAlign="center" fontSize="5vh">
+                      Completed Sessions
+                    </Typography>
+                  </button>
+                  <button
+                    style={{
+                      color: palette.grey[500],
+                      textDecoration: 'inherit',
+                      margin: '5px 0',
+                    }}
+                    onClick={handleCompletedProgressClick}
+                  >
+                    <Typography textAlign="center" fontSize="5vh">
+                      Progress
+                    </Typography>
+                  </button>
+                  <button
+                    style={{
+                      color: palette.grey[500],
+                      textDecoration: 'inherit',
+                      margin: '5px 0',
                     }}
                     onClick={handleLogout}
                   >
@@ -118,6 +183,7 @@ const NavBar = () => {
                       style={{
                         color: selectedPage === 'loginPage' ? 'inherit' : palette.grey[500],
                         textDecoration: 'inherit',
+                        margin: '5px 0',
                       }}
                       onClick={handleLoginClick}
                       to="/login"
@@ -132,6 +198,7 @@ const NavBar = () => {
                       style={{
                         color: selectedPage === 'registerPage' ? 'inherit' : palette.grey[500],
                         textDecoration: 'inherit',
+                        margin: '5px 0',
                       }}
                       onClick={handleRegisterClick}
                       to="/register"
@@ -152,27 +219,53 @@ const NavBar = () => {
           <Box sx={{ '&:hover': { color: palette.secondary[200] } }}>
             {isAuthenticated ? (
               // Display Logout when authenticated
-              <button
-                style={{
-                  color: palette.grey[500],
-                  textDecoration: 'inherit',
-                }}
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
+              <Box>
+                <button
+                  style={{
+                    color: palette.grey[500],
+                    textDecoration: 'inherit',
+                    margin: '5px 0',
+                  }}
+                  onClick={handleTemplatesClick}
+                >
+                  Templates
+                </button>
+                <button
+                  style={{
+                    color: palette.grey[500],
+                    textDecoration: 'inherit',
+                    margin: '5px 0',
+                  }}
+                  onClick={handleCompletedSessionsClick}
+                >
+                  Completed Sessions
+                </button>
+                <button
+                  style={{
+                    color: palette.grey[500],
+                    textDecoration: 'inherit',
+                    margin: '5px 0',
+                  }}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </Box>
             ) : (
               // Display Login and Register when not authenticated
-              <Box>
+              <Box sx={{ display: 'flex', gap: '10px' }}>
                 <Link
                   to="/login"
                   onClick={handleLoginClick}
                   style={{
                     color: selectedPage === 'loginPage' ? 'inherit' : palette.grey[500],
                     textDecoration: 'inherit',
+                    margin: '5px 0',
                   }}
                 >
-                  Login
+                  <Typography textAlign="center" fontSize="2vh">
+                    Login
+                  </Typography>
                 </Link>
                 <Link
                   to="/register"
@@ -180,9 +273,12 @@ const NavBar = () => {
                   style={{
                     color: selectedPage === 'registerPage' ? 'inherit' : palette.grey[500],
                     textDecoration: 'inherit',
+                    margin: '5px 0',
                   }}
                 >
-                  Register
+                  <Typography textAlign="center" fontSize="2vh">
+                    Register
+                  </Typography>
                 </Link>
               </Box>
             )}

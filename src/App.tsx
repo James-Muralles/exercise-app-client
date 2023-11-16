@@ -12,7 +12,7 @@ import { AuthState } from "./state/types"
 import WorkoutPage from "./scenes/workoutPage"
 import TemplatesPage from "./scenes/TemplatePage"
 import SessionsCompletedPage from "./scenes/completedSessionsPage"
-import WorkoutProgressChart from "./scenes/progressChart"
+import WorkoutProgressChart from "./scenes/progressPage"
 
 
 
@@ -34,6 +34,8 @@ function App() {
         <Box width="100%" height="100%" padding="1rem 2rem 4rem 2rem">
         <NavBar/>
         <Routes>
+          
+          <Route path="/" element={isAuth ?  <Navigate to="/home" />  : <LoginPage />}/>
           <Route path="/login" element={isAuth ?  <Navigate to="/home" />  : <LoginPage />}/>
           <Route path="/register" element={<RegisterPage/>}/>
           <Route path="/Templates" element={<TemplatesPage/>}/>
