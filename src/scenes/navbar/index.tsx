@@ -221,6 +221,7 @@ const NavBar = () => {
               // Display Logout when authenticated
               <Box>
                 <button
+                  className='buttonNav'
                   style={{
                     color: palette.grey[500],
                     textDecoration: 'inherit',
@@ -231,6 +232,7 @@ const NavBar = () => {
                   Templates
                 </button>
                 <button
+                  className='buttonNav'
                   style={{
                     color: palette.grey[500],
                     textDecoration: 'inherit',
@@ -240,7 +242,19 @@ const NavBar = () => {
                 >
                   Completed Sessions
                 </button>
+                 <button
+                  className='buttonNav'
+                  style={{
+                    color: palette.grey[500],
+                    textDecoration: 'inherit',
+                    margin: '5px 0',
+                  }}
+                  onClick={handleCompletedProgressClick}
+                >
+                  Progress
+                </button>
                 <button
+                  className='buttonNav'
                   style={{
                     color: palette.grey[500],
                     textDecoration: 'inherit',

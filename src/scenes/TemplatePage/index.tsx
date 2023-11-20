@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Button, Modal, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, SelectChangeEvent, useTheme, Typography, InputLabel } from '@mui/material';
 import { AuthState, Exercise } from '@/state/types';
 import { useDispatch, useSelector } from 'react-redux';
 import state, { createWorkoutTemplate, setUserTemplates } from '@/state';
 import { Link, useNavigate } from 'react-router-dom';
 
-
 const TemplatesPage = () => {
+  const { palette } = useTheme();
   const [openModal, setOpenModal] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
@@ -57,7 +57,7 @@ const TemplatesPage = () => {
   const authToken = useSelector((state: AuthState) => state.token); 
 
   const navigate = useNavigate();
-
+  
 
   useEffect(() => {
     if (userId && authToken) {
@@ -349,7 +349,7 @@ const handleStartWorkoutClick = () => {
 
   return (
     <div>
-      <button onClick={openCreateModal}>Create a Workout Template</button>
+      <button style={{width:'auto', height: '3em', borderRadius: '1em', color: palette.secondary[200]}} onClick={openCreateModal}>Create a Workout Template</button>
 
       <Modal open={openModal} onClose={closeModal}>
         <Box sx={{ width: 400, bgcolor: 'background.paper', padding: 2 }}>
@@ -434,7 +434,8 @@ const handleStartWorkoutClick = () => {
         </Box>
       </Modal>
       {/* Dropdown for selecting templates */}
-      <Select value={selectedTemplateName} onChange={handleTemplateSelect}>
+      <InputLabel sx={{color:'white'}} htmlFor="template-select">Template</InputLabel>
+      <Select id="template-select" sx={{width:'auto', height: '3em', borderRadius: '1em', backgroundColor: 'white', border: `1px solid ${palette.secondary[200]}`}} value={selectedTemplateName} onChange={handleTemplateSelect} >
         <MenuItem value="">Select a Template</MenuItem>
         {templates.map((template) => (
           <MenuItem key={template.name} value={template.name}>
@@ -445,8 +446,8 @@ const handleStartWorkoutClick = () => {
       {selectedTemplate && (
         <div>
           <h3>Selected Template: {selectedTemplate.name}</h3>
-          <button onClick={openEditModal}>Edit Template</button>
-          <button onClick={handleStartWorkoutClick}>Start Workout</button>
+          <button style={{width:'auto', height: '2em', borderRadius: '1em', color: palette.secondary[200]}} onClick={openEditModal}>Edit Template</button>
+          <button style={{width:'auto', height: '2em', borderRadius: '1em', color: palette.secondary[200]}} onClick={handleStartWorkoutClick}>Start Workout</button>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>

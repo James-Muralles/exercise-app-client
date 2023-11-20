@@ -32,9 +32,11 @@ interface WorkoutPageProps {
     setWorkoutCompleted?: React.Dispatch<React.SetStateAction<boolean>>;
   }
 
-interface ExerciseDataItem {
+  interface ExerciseDataItem {
     reps: string;
-    duration: string;
+    hours: string;
+    minutes: string;
+    seconds: string;
     notes: string;
     completed: boolean;
   }
@@ -85,11 +87,32 @@ const WorkoutPage: React.FC<WorkoutPageProps> = ({workoutCompleted = false, setW
     );
   };
 
-  const handleExerciseChange = (index: number, field: string, value: string | Boolean) => {
+  const handleExerciseChange = (index: number, field: string, value: string | boolean) => {
     const newData = [...exerciseData];
+  
+    // Ensure the structure is initialized
+    if (!newData[index].hasOwnProperty('hours')) {
+      newData[index] = { ...newData[index], hours: '00', minutes: '00', seconds: '00' };
+    }
+  
     newData[index] = { ...newData[index], [field]: value };
+  
+    console.log('New Data:', newData); // Log the entire newData array
+  
+    if (field === 'hours' || field === 'minutes' || field === 'seconds') {
+      console.log('Hours:', newData[index].hours);
+      console.log('Minutes:', newData[index].minutes);
+      console.log('Seconds:', newData[index].seconds);
+  
+      // Combine the values into 'hh:mm:ss' format
+      const combinedDuration = `${newData[index].hours.padStart(2, '0')}:${newData[index].minutes.padStart(2, '0')}:${newData[index].seconds.padStart(2, '0')}`;
+      console.log('Combined Duration:', combinedDuration);
+    }
+  
     setExerciseData(newData);
   };
+  
+  
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -100,49 +123,56 @@ const WorkoutPage: React.FC<WorkoutPageProps> = ({workoutCompleted = false, setW
   };
 const dispatch = useDispatch();
 const handleSaveWorkout = async () => {
-    const workoutData = templateData.exercises.map((exercise: Exercise, index: number) => ({
-      ...exercise,
-      ...exerciseData[index],
-    }));
+  const workoutData = templateData.exercises.map((exercise: Exercise, index: number) => ({
+    ...exercise,
+    ...exerciseData[index],
+  }));
 
-    const sessionData = {
-      user: userId,
-      name: workoutName,
-      template: templateData.id,
-      exercises: workoutData.map(({ id, reps, duration, notes, completed }: any) => ({
+  const sessionData = {
+    user: userId,
+    name: workoutName,
+    template: templateData.id,
+    exercises: workoutData.map(({ id, reps, duration, notes, completed }: any, index: number) => {
+      // Calculate combined duration
+      const combinedDuration = `${exerciseData[index].hours.padStart(2, '0')}:${exerciseData[index].minutes.padStart(2, '0')}:${exerciseData[index].seconds.padStart(2, '0')}`;
+  
+      return {
         exercise: id,
         reps,
-        duration,
+        duration: combinedDuration, // Use combined duration
         notes,
         completed,
-      })),
-      completed: true,
-    };
-
-    try {
-      const response = await fetch('http://localhost:1337/sessions/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify(sessionData),
-      });
-
-      if (response.status === 201) {
-        dispatch(setWorkoutSessions(sessionData));
-        setOpenDialog(false);
-        if(setWorkoutCompleted){
-            setWorkoutCompleted(true);
-         }
-        return;
-      }
-
-      console.error(`HTTP error! Status: ${response.status}`);
-    } catch (error) {
-      console.error('Error saving workout session:', error);
-    }
+      };
+    }),
+    completed: true,
   };
+  
+
+  try {
+    const response = await fetch('http://localhost:1337/sessions/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(sessionData),
+    });
+
+    if (response.status === 201) {
+      dispatch(setWorkoutSessions(sessionData));
+      setOpenDialog(false);
+      if (setWorkoutCompleted) {
+        setWorkoutCompleted(true);
+      }
+      return;
+    }
+
+    console.error(`HTTP error! Status: ${response.status}`);
+  } catch (error) {
+    console.error('Error saving workout session:', error);
+  }
+};
+
   const handleWorkoutCompletedDialogClose = () => {
     navigate('/completedSessions');
   };
@@ -198,9 +228,26 @@ const handleSaveWorkout = async () => {
                 </TableCell>
                 <TableCell>
                   <TextField
-                    label="Enter Time"
-                    value={exerciseData[index].duration}
-                    onChange={(e) => handleExerciseChange(index, 'duration', e.target.value)}
+                    type="number"
+                    label="Hrs"
+                    value={exerciseData[index].hours}
+                    onChange={(e) => handleExerciseChange(index, 'hours', e.target.value)}
+                    style={{ width: '6em' }}
+                  />
+                  <TextField
+                  
+                    type="number"
+                    label="Min"
+                    value={exerciseData[index].minutes}
+                    onChange={(e) => handleExerciseChange(index, 'minutes', e.target.value)}
+                    style={{ width: '6em' }}
+                  />
+                  <TextField
+                    type="number"
+                    label="Sec"
+                    value={exerciseData[index].seconds}
+                    onChange={(e) => handleExerciseChange(index, 'seconds', e.target.value)}
+                    style={{ width: '6em' }}
                   />
                 </TableCell>
                 <TableCell>

@@ -13,6 +13,7 @@ import WorkoutPage from "./scenes/workoutPage"
 import TemplatesPage from "./scenes/TemplatePage"
 import SessionsCompletedPage from "./scenes/completedSessionsPage"
 import WorkoutProgressChart from "./scenes/progressPage"
+import './index.css'
 
 
 
