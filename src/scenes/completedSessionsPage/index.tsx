@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel } from '@mui/material';
-import { setWorkoutSessions } from '@/state';
+import { deleteWorkoutSession, setWorkoutSessions } from '@/state';
 import { AuthState, WorkoutSession } from '@/state/types';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -91,6 +91,29 @@ endDate.setUTCHours(23, 59, 59, 999); // Set to the end of the day in local time
     return { date: currentDate.toISOString().split('T')[0], count, dayOfWeek };
   });
   
+  const handleDeleteSession = async (sessionId) => {
+    try {
+      const response = await fetch(`http://localhost:1337/sessions/deleteSession/${sessionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+  
+      if (response.ok) {
+       
+        dispatch(deleteWorkoutSession(sessionId));
+      } else {
+        console.log(sessionId)
+        console.error(`Failed to delete workout session. HTTP status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error deleting workout session:', error);
+    }
+  };
+  
+
 
 
 
@@ -137,6 +160,7 @@ endDate.setUTCHours(23, 59, 59, 999); // Set to the end of the day in local time
                 </TableSortLabel>
               </TableCell>
               <TableCell>Exercises</TableCell>
+              <TableCell>Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -148,12 +172,17 @@ endDate.setUTCHours(23, 59, 59, 999); // Set to the end of the day in local time
                   <ul>
                     {session.exercises.map((exercise) => (
                       <li key={exercise.id}>
-                        {exercise.exercise.name} - Reps: {exercise.reps}, Duration: {exercise.duration}, Completed:{' '}
+                        {exercise.exercise.name} - Reps: {exercise.reps},{exercise.exercise.name} - Weight: {exercise.weight}, Duration: {exercise.duration}, Completed:{' '}
                         {exercise.completed ? 'Yes' : 'No'}
                       </li>
                     ))}
                   </ul>
                 </TableCell>
+                <TableCell style={{ cursor: 'pointer' }}
+                           onClick={() => handleDeleteSession(session.id)}
+                           onMouseEnter={() => { /* Add styles for hover effect on mouse enter */ }}
+                           onMouseLeave={() => { /* Remove styles on mouse leave */ }}>Delete</TableCell>
+
               </TableRow>
             ))}
           </TableBody>

@@ -54,8 +54,13 @@ export const authSlice = createSlice({
     // // Add a reducer to save workout session data
     setWorkoutSessions: (state, action) => {
       state.workoutSessions = action.payload;
-        },
+    },
+    deleteWorkoutSession: (state, action) => {
+      const sessionIdToDelete = action.payload;
+      state.workoutSessions = state.workoutSessions.filter(session => session.id !== sessionIdToDelete);
+    },
   },
+  
 });
 
 export const {
@@ -67,6 +72,7 @@ export const {
   removeExerciseFromTemplate,
   setUserTemplates,
   // startWorkoutSession,
+  deleteWorkoutSession,
   setWorkoutSessions,
 } = authSlice.actions;
 export default authSlice.reducer;

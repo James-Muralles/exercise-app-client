@@ -34,6 +34,7 @@ interface WorkoutPageProps {
 
   interface ExerciseDataItem {
     reps: string;
+    weight: number;
     hours: string;
     minutes: string;
     seconds: string;
@@ -50,6 +51,7 @@ const WorkoutPage: React.FC<WorkoutPageProps> = ({workoutCompleted = false, setW
   const [exerciseData, setExerciseData] = useState<ExerciseDataItem[]>(
     templateData.exercises.map(() => ({
       reps: '',
+      weight:0,
       duration: '',
       notes: '',
       completed: false,
@@ -132,13 +134,14 @@ const handleSaveWorkout = async () => {
     user: userId,
     name: workoutName,
     template: templateData.id,
-    exercises: workoutData.map(({ id, reps, duration, notes, completed }: any, index: number) => {
+    exercises: workoutData.map(({ id, reps, weight, duration, notes, completed }: any, index: number) => {
       // Calculate combined duration
       const combinedDuration = `${exerciseData[index].hours.padStart(2, '0')}:${exerciseData[index].minutes.padStart(2, '0')}:${exerciseData[index].seconds.padStart(2, '0')}`;
   
       return {
         exercise: id,
         reps,
+        weight,
         duration: combinedDuration, // Use combined duration
         notes,
         completed,
@@ -162,7 +165,8 @@ const handleSaveWorkout = async () => {
       dispatch(setWorkoutSessions(sessionData));
       setOpenDialog(false);
       if (setWorkoutCompleted) {
-        setWorkoutCompleted(true);
+        setWorkoutCompleted(false);
+        navigate('/completedSessions');
       }
       return;
     }
@@ -175,6 +179,7 @@ const handleSaveWorkout = async () => {
 
   const handleWorkoutCompletedDialogClose = () => {
     navigate('/completedSessions');
+
   };
   
   
@@ -205,6 +210,7 @@ const handleSaveWorkout = async () => {
               <TableCell>Exercise Difficulty</TableCell>
               <TableCell>Exercise Instructions</TableCell>
               <TableCell>Reps</TableCell>
+              <TableCell>Weight</TableCell>
               <TableCell>Duration</TableCell>
               <TableCell>Notes</TableCell>
               <TableCell>Completed</TableCell>
@@ -224,6 +230,14 @@ const handleSaveWorkout = async () => {
                     label="Enter Reps"
                     value={exerciseData[index].reps}
                     onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    label="Enter Weight"
+                    value={exerciseData[index].weight}
+                    onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
                   />
                 </TableCell>
                 <TableCell>
