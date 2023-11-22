@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import BasketballCourtChart from '@/scenes/basketballCourtPage';
 import {
   LineChart,
   Line,
@@ -62,6 +63,7 @@ const WorkoutProgressChart = () => {
       if (selectedExerciseData) {
         const dateTimestamp = new Date(session.createdAt).getTime();
         uniqueDatesSet.add(dateTimestamp);
+        console.log(selectedExerciseData)
   
         return {
           date: dateTimestamp + index,
@@ -87,6 +89,10 @@ const WorkoutProgressChart = () => {
 
   const chartData = prepareChartData();
   const uniqueExercises = getUniqueExercises();
+  const courtData = [
+    { x: 50, y: 30, value: 5 },  // Example data point: x, y, and value (shot frequency)
+    // Add more data points as needed
+  ];
 
   return (
     <div>
@@ -126,25 +132,35 @@ const WorkoutProgressChart = () => {
   dot={false}
   connectNulls
 />
-<Tooltip 
-    
-    formatter={(value, name, props) => {
-      if (selectedMetric === 'duration') {
-        const hours = Math.floor(value / 3600);
-        const minutes = Math.floor((value % 3600) / 60);
-        const seconds = value % 60;
-        return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      }
+<Tooltip
+  labelFormatter={(value) => {
+    const selectedData = data.find((entry) => entry.date === value);
+    return selectedData ? new Date(selectedData.date).toLocaleDateString('en-US') : '';
+  }}
+  formatter={(value, name, props) => {
+    if (props.dataKey === 'duration') {
+      return `${new Date(value * 1000).toISOString().substr(11, 8)}`;
+    }
+    if (props.dataKey === 'weight') {
       return value;
-    }}
-  />
+    }
+    return null;
+  }}
+/>
+
   <Legend />
 </LineChart>
 
 
         </ResponsiveContainer>
       )}
+
+<div>
+      <h1>Basketball Court Heat Chart</h1>
+      <BasketballCourtChart data={courtData} />
     </div>
+    </div>
+    
   );
 };
 
